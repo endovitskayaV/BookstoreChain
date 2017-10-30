@@ -17,23 +17,7 @@ ${newspaper.getReleaseDate()}<br>
 № ${newspaper.getIssue()}<br>
 <br><br>
 
-Доступно:<br><br>
-<c:forEach var="chainStore" items="${chainStores}">
+<c:import url="availabilityInfo.jsp"/>
 
-    <b>${chainStore.getName()}</b><br>
-
-    <c:forEach var="shop" items="${shops}">
-        <c:if test="${shop.getChainStoreId() == chainStore.getId()}" >
-            ${shop.getAddress()}
-
-            <c:forEach var="priceCopies" items="${priceCopiesList}">
-                <c:if test="${priceCopies.getShopId() == shop.getId()}" >
-                    ${priceCopies.getPrice()} руб.   ${priceCopy.getCopiesNumber()} шт<br>
-                </c:if>
-            </c:forEach>
-        </c:if>
-    </c:forEach>
-    <br>
-</c:forEach>
 </body>
 </html>

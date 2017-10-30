@@ -17,7 +17,7 @@
         <tr>
             <td>
                 <a href="newspaperInfo?id=${newspaper.getId()}"> ${newspaper.getName()}</a><br>
-                ${newspaper.getIssue()}
+                №${newspaper.getIssue()}
                 <br><br>
             </td>
         </tr>

@@ -17,7 +17,7 @@
         <tr>
             <td>
                 <a href="magazineInfo?id=${magazine.getId()}"> ${magazine.getName()}</a><br>
-                    ${magazine.getIssue()}
+                    № ${magazine.getIssue()}
             </td>
         </tr>
     </c:forEach>
