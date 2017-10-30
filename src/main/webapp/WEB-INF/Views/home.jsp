@@ -12,10 +12,11 @@
 </head>
 <body>
 Что нужно?
-<a href="books">Книги</a>
-<!--<a href="newspapers">Газеты</a>
-<a href="magazines">Журналы</a>
-!-->
+<ul>
+    <li><a href="books">Книги</a></li>
+    <li><a href="newspapers">Газеты</a></li>
+    <li><a href="magazines">Журналы</a></li>
+</ul><br><br>
 <a href="admin">Admin</a>
 </body>
 </html>
