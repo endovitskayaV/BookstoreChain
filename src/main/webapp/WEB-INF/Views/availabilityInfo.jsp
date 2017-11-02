@@ -9,13 +9,20 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <body>
-Доступно:<br><br>
+
+<c:if test="${chainStores.isEmpty()}">
+    Нет в продаже
+</c:if>
+<c:if test="${chaiStores.size()>0}">
+    Доступно:
+</c:if>
+<br><br>
 <c:forEach var="chainStore" items="${chainStores}">
 
     <b>${chainStore.getName()}</b><br>
 
     <c:forEach var="shop" items="${shops}">
-        <c:if test="${shop.getChainStoreId() == chainStore.getId()}" >
+        <c:if test="${shop.getChainStoreId() == chainStore.getId()}">
             ${shop.getAddress()}
 
             <c:forEach var="priceCopies" items="${priceCopiesList}">
@@ -23,8 +30,10 @@
                     ${priceCopies.getPrice()} руб.   ${priceCopy.getCopiesNumber()} шт<br>
                 </c:if>
             </c:forEach>
+
         </c:if>
     </c:forEach>
+
     <br>
 </c:forEach>
 </body>

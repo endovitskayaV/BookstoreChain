@@ -96,7 +96,7 @@ public class HomeController {
 
         dbConnection.closeConnection();
 
-        setAvailabilityModel("book",id, modelMap);
+        setAvailabilityModel("book", id, modelMap);
         return "bookInfo";
     }
 
@@ -116,7 +116,7 @@ public class HomeController {
         }
         dbConnection.closeConnection();
 
-        setAvailabilityModel("magazine",id, modelMap);
+        setAvailabilityModel("magazine", id, modelMap);
         return "magazineInfo";
     }
 
@@ -135,7 +135,7 @@ public class HomeController {
         }
         dbConnection.closeConnection();
 
-        setAvailabilityModel("newspaper",id, modelMap);
+        setAvailabilityModel("newspaper", id, modelMap);
 
         return "newspaperInfo";
     }
@@ -144,14 +144,111 @@ public class HomeController {
     public String admin(ModelMap modelMap) throws SQLException, ClassNotFoundException {
 
         DBConnection dbConnection = DBConnection.newInstance();
-        ResultSet resultSet = dbConnection.executeQuery("select id, name from book");
-        resultSet = dbConnection.executeQuery("select id, name from newspaper");
-        resultSet = dbConnection.executeQuery("select id, name from magazine");
-        resultSet = dbConnection.executeQuery("select id, name from shop");
+        ResultSet resultSet = dbConnection.executeQuery("select id, name, author from book");
+        ArrayList<Book> books = new ArrayList<Book>();
+        while (resultSet.next()) {
+            Book book = new Book()
+                    .setId(resultSet.getInt(1))
+                    .setName(resultSet.getString(2))
+                    .setAuthor(resultSet.getString(3));
+            books.add(book);
+        }
+        modelMap.addAttribute("books", books);
+        dbConnection.closeConnection();
+
+        dbConnection = DBConnection.newInstance();
+        resultSet = dbConnection.executeQuery("select id, name,issue from newspaper");
+        ArrayList<Newspaper> newspapers = new ArrayList<Newspaper>();
+        while (resultSet.next()) {
+            Newspaper newspaper = new Newspaper()
+                    .setId(resultSet.getInt(1))
+                    .setName(resultSet.getString(2))
+                    .setIssue(resultSet.getInt(3));
+            newspapers.add(newspaper);
+        }
+        modelMap.addAttribute("newspapers", newspapers);
+        dbConnection.closeConnection();
+
+        dbConnection = DBConnection.newInstance();
+        resultSet = dbConnection.executeQuery("select id, name,issue from magazine");
+        ArrayList<Magazine> magazines = new ArrayList<Magazine>();
+        while (resultSet.next()) {
+            Magazine magazine = new Magazine()
+                    .setId(resultSet.getInt(1))
+                    .setName(resultSet.getString(2))
+                    .setIssue(resultSet.getInt(3));
+            magazines.add(magazine);
+        }
+        modelMap.addAttribute("magazines", magazines);
+        dbConnection.closeConnection();
+
+        dbConnection = DBConnection.newInstance();
+        resultSet = dbConnection.executeQuery("select id, name, address from shop");
+        ArrayList<Shop> shops = new ArrayList<Shop>();
+        while (resultSet.next()) {
+            Shop shop = new Shop()
+                    .setId(resultSet.getInt(1))
+                    .setName(resultSet.getString(2))
+                    .setAddress(resultSet.getString(3));
+            shops.add(shop);
+        }
+        modelMap.addAttribute("shops", shops);
+        dbConnection.closeConnection();
+
+        dbConnection = DBConnection.newInstance();
         resultSet = dbConnection.executeQuery("select id, name from chain_store");
-        resultSet = dbConnection.executeQuery("select * from concrete_book_shop");
+        ArrayList<ChainStore> chainStores = new ArrayList<ChainStore>();
+        while (resultSet.next()) {
+            ChainStore chainStore = new ChainStore()
+                    .setId(resultSet.getInt(1))
+                    .setName(resultSet.getString(2));
+            chainStores.add(chainStore);
+        }
+        modelMap.addAttribute("chainStores", chainStores);
+        dbConnection.closeConnection();
+
+        dbConnection = DBConnection.newInstance();
         resultSet = dbConnection.executeQuery("select * from concrete_newspaper_shop");
+        ArrayList<ConcreteBookShop> concreteBooksShops=new ArrayList<ConcreteBookShop>();
+        while (resultSet.next()){
+            ConcreteBookShop concreteBookShop=new ConcreteBookShop()
+                    .setBookId(resultSet.getInt(1))
+                    .setShopId(resultSet.getInt(2))
+                    .setPrice(resultSet.getInt(3))
+                    .setCopiesNumber(resultSet.getInt(4));
+            concreteBooksShops.add(concreteBookShop);
+        }
+        modelMap.addAttribute("concreteBooksShops", concreteBooksShops);
+        dbConnection.closeConnection();
+
+        dbConnection = DBConnection.newInstance();
+        resultSet = dbConnection.executeQuery("select * from concrete_newspaper_shop");
+        ArrayList<ConcreteNewspaperShop> concreteNewspapersShops=new ArrayList<ConcreteNewspaperShop>();
+        while (resultSet.next()){
+            ConcreteNewspaperShop concreteNewspaperShop=new ConcreteNewspaperShop()
+                    .setNewspaperId(resultSet.getInt(1))
+                    .setShopId(resultSet.getInt(2))
+                    .setPrice(resultSet.getInt(3))
+                    .setCopiesNumber(resultSet.getInt(4));
+            concreteNewspapersShops.add(concreteNewspaperShop);
+        }
+        modelMap.addAttribute("concreteNewspapersShops", concreteNewspapersShops);
+        dbConnection.closeConnection();
+
+        dbConnection = DBConnection.newInstance();
         resultSet = dbConnection.executeQuery("select * from concrete_magazine_shop");
+        ArrayList<ConcreteMagazineShop> concreteMagazinesShops=new ArrayList<ConcreteMagazineShop>();
+        while (resultSet.next()){
+            ConcreteMagazineShop concreteMagazineShop=new ConcreteMagazineShop()
+                    .setMagazineId(resultSet.getInt(1))
+                    .setShopId(resultSet.getInt(2))
+                    .setPrice(resultSet.getInt(3))
+                    .setCopiesNumber(resultSet.getInt(4));
+            concreteMagazinesShops.add(concreteMagazineShop);
+        }
+        modelMap.addAttribute("concreteMagazinesShops", concreteMagazinesShops);
+        dbConnection.closeConnection();
+
         return "admin";
     }
 
@@ -161,8 +258,8 @@ public class HomeController {
         ResultSet resultSet = dbConnection.executeQuery(
                 "select distinct(name), id  from chain_store where id=any(" +
                         "select distinct(chain_store_id)  from shop        where id=any(" +
-                        "select shop_id  from concrete_"+itemType+"_shop   " +
-                        "where (copies_number>0) & ("+itemType+"_id=" + id + ")))" +
+                        "select shop_id  from concrete_" + itemType + "_shop   " +
+                        "where (copies_number>0) & (" + itemType + "_id=" + id + ")))" +
                         "order by id asc");
         ArrayList<ChainStore> chainStores = new ArrayList<ChainStore>();
 
@@ -173,23 +270,24 @@ public class HomeController {
             chainStores.add(chainStore);
         }
 
+
         dbConnection.closeConnection();
         modelMap.addAttribute("chainStores", chainStores);
 
         dbConnection = DBConnection.newInstance();
         //--------------------------------------shops | prices | copies_num-----------------------------------------------//
         resultSet = dbConnection.executeQuery(
-                "select shop.chain_store_id, shop.address, concrete_"+itemType+"_shop.price, concrete_"+itemType+"_shop.copies_number, shop.id\n" +
-                        "from shop left outer join concrete_"+itemType+"_shop\n" +
-                        "on ((shop.id=concrete_"+itemType+"_shop.shop_id) &\n" +
-                        "(concrete_"+itemType+"_shop."+itemType+"_id=" + id + ") & (concrete_"+itemType+"_shop.copies_number>0))\n" +
+                "select shop.chain_store_id, shop.address, concrete_" + itemType + "_shop.price, concrete_" + itemType + "_shop.copies_number, shop.id\n" +
+                        "from shop left outer join concrete_" + itemType + "_shop\n" +
+                        "on ((shop.id=concrete_" + itemType + "_shop.shop_id) &\n" +
+                        "(concrete_" + itemType + "_shop." + itemType + "_id=" + id + ") & (concrete_" + itemType + "_shop.copies_number>0))\n" +
                         "order by shop.chain_store_id");
         ArrayList<Shop> shops = new ArrayList<Shop>();
         ArrayList<ConcreteNewspaperShop> priceCopies = new ArrayList<ConcreteNewspaperShop>();
         while (resultSet.next()) {
             if (chainStores.size() > 0) {
                 int price = resultSet.getInt(3);
-                if (price > 0) {
+                if (price > 0) { // тк left join правая часть (price и колво копий  мб =0)
                     int shopId = resultSet.getInt(5);
                     Shop shop = new Shop()
                             .setId(shopId)
