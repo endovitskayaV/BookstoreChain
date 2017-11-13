@@ -18,6 +18,7 @@ public class HomeController {
         return "home";
     }
 
+    //TODO: try-catch-finally to close session
     @RequestMapping(value = "/newspapers")
     public String newspapers(ModelMap modelMap) throws SQLException, ClassNotFoundException {
 
