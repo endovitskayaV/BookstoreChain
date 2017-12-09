@@ -14,18 +14,18 @@
 </head>
 <body>
 Книги<br>
-<a href=""> add</a>
+<a href="addBook"> add</a>
 <table border="1">
     <tr><td>id</td><td>Название</td></tr>
-    <c:forEach var="book" items="${books}" >
+    <c:forEach var="book" items="${books}">
         <tr>
             <td>${book.getId()}</td>
             <td>
-                <a href="bookEdit?id=${book.getId()}"> ${book.getName()}</a><br>
+                <a href="/bookInfo?id=${book.getId()}"> ${book.getName()}</a><br>
                     ${book.getAuthor()}
             </td>
-            <td><a href=""> edit</a></td>
-            <td> <a href=""> delete</a></td>
+            <td><a href="editBook?id=${book.getId()}"> edit</a></td>
+            <td> <a href="deleteBook?id=${book.getId()}" onclick = "return confirm('Удалить?');" >Удалить</a></td>
         </tr>
     </c:forEach>
 </table>

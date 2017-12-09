@@ -23,6 +23,10 @@ public class DBConnection {
         return connection.createStatement().executeQuery(query);
     }
 
+    public void executeUpdate(String query) throws SQLException {
+         connection.prepareStatement(query).executeUpdate();
+    }
+
     public void closeConnection() throws SQLException {
         connection.close();
     }

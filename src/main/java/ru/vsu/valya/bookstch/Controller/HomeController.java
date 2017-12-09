@@ -1,17 +1,26 @@
 package ru.vsu.valya.bookstch.Controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import ru.vsu.valya.bookstch.Model.*;
 import ru.vsu.valya.bookstch.db.config.DBConnection;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 @Controller
 public class HomeController {
+
+    @RequestMapping(value = "/error")
+    public String error(ModelMap modelMap, String msg) {
+        modelMap.addAttribute("error", msg);
+        return "error";
+    }
 
     @RequestMapping(value = "/")
     public String home() {
@@ -90,7 +99,7 @@ public class HomeController {
                     .setName(resultSet.getString(2))
                     .setAuthor(resultSet.getString(3))
                     .setPublisher(resultSet.getString(4))
-                    .setReleaseYear(resultSet.getDate(5))
+                    .setReleaseYear(resultSet.getInt(5))
                     .setPagesNumber(resultSet.getInt(6));
             modelMap.addAttribute("book", book);
         }
@@ -110,7 +119,7 @@ public class HomeController {
         while (resultSet.next()) {
             Magazine magazine = new Magazine()
                     .setName(resultSet.getString(2))
-                    .setReleaseDate(resultSet.getDate(3))
+                    .setReleaseYear(resultSet.getInt(3))
                     .setIssue(resultSet.getInt(4))
                     .setPagesNumber(resultSet.getInt(5));
             modelMap.addAttribute("magazine", magazine);
@@ -141,7 +150,7 @@ public class HomeController {
         return "newspaperInfo";
     }
 
-    @RequestMapping(value = "/admin")
+    @RequestMapping(value = "/admin", method = RequestMethod.GET)
     public String admin(ModelMap modelMap) throws SQLException, ClassNotFoundException {
 
         DBConnection dbConnection = DBConnection.newInstance();
@@ -209,7 +218,7 @@ public class HomeController {
         dbConnection.closeConnection();
 
         dbConnection = DBConnection.newInstance();
-        resultSet = dbConnection.executeQuery("select * from concrete_newspaper_shop");
+        resultSet = dbConnection.executeQuery("select * from concrete_book_shop");
         ArrayList<ConcreteBookShop> concreteBooksShops=new ArrayList<ConcreteBookShop>();
         while (resultSet.next()){
             ConcreteBookShop concreteBookShop=new ConcreteBookShop()
@@ -249,6 +258,87 @@ public class HomeController {
         }
         modelMap.addAttribute("concreteMagazinesShops", concreteMagazinesShops);
         dbConnection.closeConnection();
+
+        return "admin";
+    }
+
+    @RequestMapping(value = "/addBook", method = RequestMethod.GET)
+    public String addBook(ModelMap modelMap){
+        modelMap.addAttribute("maxYear", Calendar.getInstance().get(Calendar.YEAR));
+        return "addBook";
+    }
+
+    @RequestMapping(value = "/addBook", method = RequestMethod.POST)
+    public String addBook(ModelMap modelMap, Book book)  throws SQLException, ClassNotFoundException{
+
+        DBConnection dbConnection = DBConnection.newInstance();
+        dbConnection.executeQuery(
+                "insert into `Book` " +
+                "(`id`, `name`, `author`, `publisher`, `release_year`, `page_numbers`) \n" +
+                "value ("+
+                        book.getId()+", "+
+                        book.getName()+", "+
+                        book.getAuthor()+", "+
+                        book.getPublisher()+", "+
+                        book.getReleaseYear()+", "+
+                        book.getPagesNumber()+");");
+        dbConnection.closeConnection();
+        return admin(modelMap);
+    }
+
+    @RequestMapping(value = "/editBook", method = RequestMethod.GET)
+    public String editBook(ModelMap modelMap, int id) throws SQLException, ClassNotFoundException {
+        DBConnection dbConnection = DBConnection.newInstance();
+        ResultSet resultSet = dbConnection.executeQuery(
+                "select id, name, author, publisher, release_year, page_numbers" +
+                        " from book " +
+                        "where id="+id);
+        Book book = new Book();
+        while (resultSet.next()) {
+            book
+                    .setId(resultSet.getInt(1))
+                    .setName(resultSet.getString(2))
+                    .setAuthor(resultSet.getString(3))
+                    .setPublisher(resultSet.getString(4))
+                    .setReleaseYear(resultSet.getInt(5))
+                    .setPagesNumber(resultSet.getInt(6));
+        }
+        modelMap.addAttribute("book", book);
+        dbConnection.closeConnection();
+
+        return "editBook";
+    }
+
+    @RequestMapping(value = "/editBook", method = RequestMethod.POST)
+    public String editBook(ModelMap modelMap, Book book) throws SQLException, ClassNotFoundException {
+        DBConnection dbConnection = DBConnection.newInstance();
+        dbConnection.executeUpdate(
+                "update book set " +
+                        "name='"+ book.getName()+"',"+
+                        "author='"+ book.getAuthor()+"',"+
+                        "publisher='"+ book.getPublisher()+"',"+
+                        "release_year='"+ book.getReleaseYear()+"',"+
+                        "page_numbers='"+ book.getPagesNumber()+"'"+
+                        "where id="+book.getId());
+
+        dbConnection.closeConnection();
+        return admin(modelMap);
+    }
+
+    @RequestMapping(value = "/deleteBook")
+    public String deleteBook(ModelMap modelMap, int id){
+
+        try{
+            DBConnection dbConnection = DBConnection.newInstance();
+            dbConnection.executeQuery(
+                "delete from book where id=" + id);
+            dbConnection.closeConnection();}
+                catch (SQLException e){
+                    return error(modelMap, "cannot delete");
+                }
+                catch (ClassNotFoundException e){
+                    return error(modelMap, "cannot delete");
+                }
 
         return "admin";
     }

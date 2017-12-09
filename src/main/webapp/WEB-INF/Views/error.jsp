@@ -12,5 +12,6 @@
 </head>
 <body>
 Oops! Some problems. Reload this page or try later.
+${error}
 </body>
 </html>
