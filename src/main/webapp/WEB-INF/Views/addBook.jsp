@@ -12,24 +12,24 @@
     <title>Новая книга</title>
 </head>
 <body>
-<form action="editBook" method="post">
+<form action="addBook" method="post">
 
-    <input name="id" hidden value="" type="number"/>
+    <input name="id" hidden value="${book.getId()}" type="number"/>
 
     <p><b>Название:</b><br>
-        <input name="name" value="" type="text"/>
+        <input name="name" value="${book.getName()}" type="text"/>
     </p>
     <p><b>Автор:</b><br>
-        <input name="author" value="" type="text"/>
+        <input name="author" value="${book.getAuthor()}" type="text"/>
     </p>
     <p><b>Издатель:</b><br>
-        <input name="publisher" value="" type="text"/>
+        <input name="publisher" value="${book.getPublisher()}" type="text"/>
     </p>
     <p><b>Год издания:</b><br>
-        <input name="releaseYear" value="" type="number"/>
+        <input name="releaseYear" min="1" max="${maxYear}" value="${book.getReleaseYear()}" type="number"/>
     </p>
     <p><b>Количество страниц:</b><br>
-        <input name="pagesNumber" value="" type="number" min="3"/>
+        <input name="pagesNumber" min="3" value="${book.getPagesNumber()}" type="number"/>
     </p>
 
     <button type="reset"> Отмена</button>

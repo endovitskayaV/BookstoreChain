@@ -1,8 +1,10 @@
 package ru.vsu.valya.bookstch.Controller;
 
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import ru.vsu.valya.bookstch.Model.*;
@@ -11,6 +13,7 @@ import ru.vsu.valya.bookstch.db.config.DBConnection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 
 @Controller
@@ -264,6 +267,8 @@ public class HomeController {
 
     @RequestMapping(value = "/addBook", method = RequestMethod.GET)
     public String addBook(ModelMap modelMap){
+        Book book=new Book().setPagesNumber(3).setReleaseYear(1);
+        modelMap.addAttribute("book", book);
         modelMap.addAttribute("maxYear", Calendar.getInstance().get(Calendar.YEAR));
         return "addBook";
     }
@@ -272,16 +277,16 @@ public class HomeController {
     public String addBook(ModelMap modelMap, Book book)  throws SQLException, ClassNotFoundException{
 
         DBConnection dbConnection = DBConnection.newInstance();
-        dbConnection.executeQuery(
+        dbConnection.executeUpdate(
                 "insert into `Book` " +
                 "(`id`, `name`, `author`, `publisher`, `release_year`, `page_numbers`) \n" +
-                "value ("+
-                        book.getId()+", "+
-                        book.getName()+", "+
-                        book.getAuthor()+", "+
-                        book.getPublisher()+", "+
-                        book.getReleaseYear()+", "+
-                        book.getPagesNumber()+");");
+                "value (" +
+                       "NULL, "+
+                        "'" + book.getName()+"', "+
+                        "'" +book.getAuthor()+"', "+
+                        "'" +book.getPublisher()+"', "+
+                        "'" +book.getReleaseYear()+"', "+
+                        "'" +book.getPagesNumber()+"');");
         dbConnection.closeConnection();
         return admin(modelMap);
     }
@@ -309,7 +314,9 @@ public class HomeController {
         return "editBook";
     }
 
-    @RequestMapping(value = "/editBook", method = RequestMethod.POST)
+    @RequestMapping(value = "/editBook",
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public String editBook(ModelMap modelMap, Book book) throws SQLException, ClassNotFoundException {
         DBConnection dbConnection = DBConnection.newInstance();
         dbConnection.executeUpdate(
