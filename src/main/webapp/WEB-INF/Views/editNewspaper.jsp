@@ -24,7 +24,7 @@
     <p><b>Год издания:</b><br>
         <input name="releaseYear" value="${newspaper.getReleaseYear()}" type="number"/>
     </p>
-    <p><b>Количество страниц:</b><br>
+    <p><b>Номер:</b><br>
         <input name="issue" value="${newspaper.getIssue()}" type="number" min="3"/>
     </p>
 

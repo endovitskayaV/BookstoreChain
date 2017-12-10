@@ -1,11 +1,18 @@
 package ru.vsu.valya.bookstch.Model;
 
+import java.util.Arrays;
 
 public class Newspaper {
     private  int id;
     private  String name;
     private int releaseYear;
     private int issue;
+    private ConcreteProductInShop[] concreteProductInShopArr;
+
+    public Newspaper() {
+        concreteProductInShopArr =new ConcreteProductInShop[100];
+    }
+
 
     public int getId() {
         return id;
@@ -40,6 +47,15 @@ public class Newspaper {
 
     public Newspaper setIssue(int issue) {
         this.issue = issue;
+        return this;
+    }
+
+    public ConcreteProductInShop[] getConcreteProductInShopArr() {
+        return concreteProductInShopArr;
+    }
+
+    public Newspaper setConcreteProductInShopArr(ConcreteProductInShop[] concreteProductInShopArr) {
+        Arrays.asList(this.concreteProductInShopArr).addAll(Arrays.asList(this.concreteProductInShopArr));
         return this;
     }
 }

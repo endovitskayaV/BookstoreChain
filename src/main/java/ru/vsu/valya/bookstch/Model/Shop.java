@@ -2,7 +2,6 @@ package ru.vsu.valya.bookstch.Model;
 
 public class Shop {
     private  int id;
-    private String name;
     private String  address;
     private int chainStoreId;
 
@@ -11,10 +10,6 @@ public class Shop {
         return this;
     }
 
-    public Shop setName(String name) {
-        this.name = name;
-        return this;
-    }
 
     public Shop setAddress(String address) {
         this.address = address;
@@ -30,9 +25,6 @@ public class Shop {
         return id;
     }
 
-    public String getName() {
-        return name;
-    }
 
     public String getAddress() {
         return address;

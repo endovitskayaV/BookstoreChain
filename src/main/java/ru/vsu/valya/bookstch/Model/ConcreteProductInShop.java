@@ -1,6 +1,6 @@
 package ru.vsu.valya.bookstch.Model;
 
-public class ConcreteProductShop {
+public class ConcreteProductInShop {
 
     private String itemName;
     private int itemId;
@@ -12,7 +12,7 @@ public class ConcreteProductShop {
         return itemName;
     }
 
-    public ConcreteProductShop setItemName(String itemName) {
+    public ConcreteProductInShop setItemName(String itemName) {
         this.itemName = itemName;
         return this;
     }
@@ -21,7 +21,7 @@ public class ConcreteProductShop {
         return itemId;
     }
 
-   public ConcreteProductShop setItemId(int itemId) {
+   public ConcreteProductInShop setItemId(int itemId) {
         this.itemId = itemId;
         return this;
     }
@@ -30,7 +30,7 @@ public class ConcreteProductShop {
         return shopId;
     }
 
-   public ConcreteProductShop setShopId(int shopId) {
+   public ConcreteProductInShop setShopId(int shopId) {
         this.shopId = shopId;
         return this;
     }
@@ -39,7 +39,7 @@ public class ConcreteProductShop {
         return price;
     }
 
-   public ConcreteProductShop setPrice(int price) {
+   public ConcreteProductInShop setPrice(int price) {
         this.price = price;
         return this;
     }
@@ -48,7 +48,7 @@ public class ConcreteProductShop {
         return copiesNumber;
     }
 
-   public ConcreteProductShop setCopiesNumber(int copiesNumber) {
+   public ConcreteProductInShop setCopiesNumber(int copiesNumber) {
         this.copiesNumber = copiesNumber;
         return this;
     }

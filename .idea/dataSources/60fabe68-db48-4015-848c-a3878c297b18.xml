@@ -325,37 +325,32 @@ issue</ColNames>
       <NotNull>1</NotNull>
       <SequenceIdentity>1</SequenceIdentity>
     </column>
-    <column id="79" parent="18" name="name">
+    <column id="79" parent="18" name="address">
       <Position>2</Position>
-      <DataType>varchar(150)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <column id="80" parent="18" name="address">
-      <Position>3</Position>
       <DataType>varchar(250)|0</DataType>
     </column>
-    <column id="81" parent="18" name="chain_store_id">
-      <Position>4</Position>
+    <column id="80" parent="18" name="chain_store_id">
+      <Position>3</Position>
       <DataType>int(250)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <index id="82" parent="18" name="address">
+    <index id="81" parent="18" name="address">
       <ColNames>address</ColNames>
       <Unique>1</Unique>
     </index>
-    <index id="83" parent="18" name="Shop_fk0">
+    <index id="82" parent="18" name="Shop_fk0">
       <ColNames>chain_store_id</ColNames>
     </index>
-    <key id="84" parent="18" name="PRIMARY">
+    <key id="83" parent="18" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <key id="85" parent="18" name="address">
+    <key id="84" parent="18" name="address">
       <ColNames>address</ColNames>
       <UnderlyingIndexName>address</UnderlyingIndexName>
     </key>
-    <foreign-key id="86" parent="18" name="Shop_fk0">
+    <foreign-key id="85" parent="18" name="Shop_fk0">
       <ColNames>chain_store_id</ColNames>
       <RefSchemaName>bookstore_chain</RefSchemaName>
       <RefTableName>chain_store</RefTableName>

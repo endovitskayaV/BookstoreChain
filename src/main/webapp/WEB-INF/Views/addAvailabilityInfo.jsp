@@ -21,8 +21,8 @@
 
     <input name="backAddr" hidden value="${backAddr}" type="text"/>
 
-    <input name="itemName" hidden value="${concreteProductShop.getItemName()}" type="text"/>
-    <input name="itemId" hidden value="${concreteProductShop.getItemId()}" type="number"/>
+    <input name="itemName" hidden value="${concreteProductInShop.getItemName()}" type="text"/>
+    <input name="itemId" hidden value="${concreteProductInShop.getItemId()}" type="number"/>
 
 
     <c:if test="${!chainStores.isEmpty()}">
@@ -46,10 +46,10 @@
 
 
     <p><b>Количество экземпляров:</b><br>
-        <input name="copiesNumber" value="${concreteProductShop.getCopiesNumber()}" type="number"/>
+        <input name="copiesNumber" value="${concreteProductInShop.getCopiesNumber()}" type="number"/>
     </p>
     <p><b>Цена:</b><br>
-        <input name="price" value="${concreteProductShop.getPrice()}" type="number"/>
+        <input name="price" value="${concreteProductInShop.getPrice()}" type="number"/>
     </p>
 
     <button type="reset"> Отмена</button>

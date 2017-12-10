@@ -1,6 +1,5 @@
 package ru.vsu.valya.bookstch.Controller;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -14,7 +13,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.List;
 
 @Controller
 public class HomeController {
@@ -196,13 +194,13 @@ public class HomeController {
         dbConnection.closeConnection();
 
         dbConnection = DBConnection.newInstance();
-        resultSet = dbConnection.executeQuery("select id, name, address from shop");
+        resultSet = dbConnection.executeQuery("select id, address, chain_store_id from shop");
         ArrayList<Shop> shops = new ArrayList<Shop>();
         while (resultSet.next()) {
             Shop shop = new Shop()
                     .setId(resultSet.getInt(1))
-                    .setName(resultSet.getString(2))
-                    .setAddress(resultSet.getString(3));
+                    .setAddress(resultSet.getString(2))
+                    .setChainStoreId(resultSet.getInt(3));
             shops.add(shop);
         }
         modelMap.addAttribute("shops", shops);
@@ -218,48 +216,6 @@ public class HomeController {
             chainStores.add(chainStore);
         }
         modelMap.addAttribute("chainStores", chainStores);
-        dbConnection.closeConnection();
-
-        dbConnection = DBConnection.newInstance();
-        resultSet = dbConnection.executeQuery("select * from concrete_book_shop");
-        ArrayList<ConcreteBookShop> concreteBooksShops = new ArrayList<ConcreteBookShop>();
-        while (resultSet.next()) {
-            ConcreteBookShop concreteBookShop = new ConcreteBookShop()
-                    .setBookId(resultSet.getInt(1))
-                    .setShopId(resultSet.getInt(2))
-                    .setPrice(resultSet.getInt(3))
-                    .setCopiesNumber(resultSet.getInt(4));
-            concreteBooksShops.add(concreteBookShop);
-        }
-        modelMap.addAttribute("concreteBooksShops", concreteBooksShops);
-        dbConnection.closeConnection();
-
-        dbConnection = DBConnection.newInstance();
-        resultSet = dbConnection.executeQuery("select * from concrete_newspaper_shop");
-        ArrayList<ConcreteNewspaperShop> concreteNewspapersShops = new ArrayList<ConcreteNewspaperShop>();
-        while (resultSet.next()) {
-            ConcreteNewspaperShop concreteNewspaperShop = new ConcreteNewspaperShop()
-                    .setNewspaperId(resultSet.getInt(1))
-                    .setShopId(resultSet.getInt(2))
-                    .setPrice(resultSet.getInt(3))
-                    .setCopiesNumber(resultSet.getInt(4));
-            concreteNewspapersShops.add(concreteNewspaperShop);
-        }
-        modelMap.addAttribute("concreteNewspapersShops", concreteNewspapersShops);
-        dbConnection.closeConnection();
-
-        dbConnection = DBConnection.newInstance();
-        resultSet = dbConnection.executeQuery("select * from concrete_magazine_shop");
-        ArrayList<ConcreteMagazineShop> concreteMagazinesShops = new ArrayList<ConcreteMagazineShop>();
-        while (resultSet.next()) {
-            ConcreteMagazineShop concreteMagazineShop = new ConcreteMagazineShop()
-                    .setMagazineId(resultSet.getInt(1))
-                    .setShopId(resultSet.getInt(2))
-                    .setPrice(resultSet.getInt(3))
-                    .setCopiesNumber(resultSet.getInt(4));
-            concreteMagazinesShops.add(concreteMagazineShop);
-        }
-        modelMap.addAttribute("concreteMagazinesShops", concreteMagazinesShops);
         dbConnection.closeConnection();
 
         return "admin";
@@ -334,7 +290,7 @@ public class HomeController {
                         "NULL, " +
                         "'" + magazine.getName() + "', " +
                         "'" + magazine.getReleaseYear() + "', " +
-                        "'" + magazine.getIssue() +
+                        "'" + magazine.getIssue() + "', " +
                         "'" + magazine.getPagesNumber() +"');");
         dbConnection.closeConnection();
         return admin(modelMap);
@@ -344,16 +300,16 @@ public class HomeController {
     @RequestMapping(value = "/addAvailabilityInfo", method = RequestMethod.GET)
     public String addAvailabilityInfo(ModelMap modelMap, int itemId, String itemName, String backAddr)
             throws SQLException, ClassNotFoundException {
-        ConcreteProductShop concreteProductShop = new ConcreteProductShop()
+        ConcreteProductInShop concreteProductInShop = new ConcreteProductInShop()
                 .setItemId(itemId)
                 .setItemName(itemName);
-        modelMap.addAttribute("concreteProductShop", concreteProductShop);
+        modelMap.addAttribute("concreteProductInShop", concreteProductInShop);
 
         //-------------------shops that can be added----------------------------------//
         DBConnection dbConnection = DBConnection.newInstance();
         ResultSet resultSet = dbConnection.executeQuery("select id, address, chain_store_id from shop\n" +
                 "where id not in (select shop_id from concrete_" + itemName + "_shop\n" +
-                "where book_id=" + itemId + " and copies_number>0);");
+                "where "+itemName+"_id=" + itemId + " and copies_number>0);");
 
 
         ArrayList<Shop> shops = new ArrayList<Shop>();
@@ -374,7 +330,7 @@ public class HomeController {
         resultSet = dbConnection.executeQuery("select id, name from chain_store\n" +
                 "where id in (select chain_store_id from shop\n" +
                 "where id not in (select shop_id from concrete_" + itemName + "_shop\n" +
-                "where book_id=" + itemId + " and copies_number>0));");
+                "where "+itemName+"_id=" + itemId + " and copies_number>0));");
 
 
         ArrayList<ChainStore> chainStores = new ArrayList<ChainStore>();
@@ -393,25 +349,27 @@ public class HomeController {
 
     @RequestMapping(value = "/addAvailabilityInfo", method = RequestMethod.POST)
     public String addAvailabilityInfo(ModelMap modelMap, String backAddr,
-                                      ConcreteProductShop concreteProductShop)
+                                      ConcreteProductInShop concreteProductInShop)
             throws SQLException, ClassNotFoundException {
-        if(concreteProductShop.getCopiesNumber()>0) {
+        if(concreteProductInShop.getCopiesNumber()>0) {
             DBConnection dbConnection = DBConnection.newInstance();
             dbConnection.executeUpdate(
                     "insert into " +
-                            "`concrete_" + concreteProductShop.getItemName().toLowerCase() + "_shop` " +
-                            "(`book_id`, `shop_id`, `price`, `copies_number`) \n" +
+                            "`concrete_" + concreteProductInShop.getItemName().toLowerCase() + "_shop` " +
+                            "(`"+concreteProductInShop.getItemName()+"_id`," +
+                            " `shop_id`, `price`, `copies_number`) \n" +
                             "value (" +
-                            "'" + concreteProductShop.getItemId() + "', " +
-                            "'" + concreteProductShop.getShopId() + "', " +
-                            "'" + concreteProductShop.getPrice() + "', " +
-                            "'" + concreteProductShop.getCopiesNumber() + "');");
+                            "'" + concreteProductInShop.getItemId() + "', " +
+                            "'" + concreteProductInShop.getShopId() + "', " +
+                            "'" + concreteProductInShop.getPrice() + "', " +
+                            "'" + concreteProductInShop.getCopiesNumber() + "');");
 
             dbConnection.closeConnection();
         }
         switch (backAddr){
-            case "editBook": return editBook(modelMap,concreteProductShop.getItemId());
-            case "addBook": return addBook(modelMap);
+            case "editBook": return editBook(modelMap, concreteProductInShop.getItemId());
+            case "editNewspaper": return editNewspaper(modelMap, concreteProductInShop.getItemId());
+            case "editMagazine": return editMagazine(modelMap, concreteProductInShop.getItemId());
             default:       return admin(modelMap);
         }
     }
@@ -447,22 +405,22 @@ public class HomeController {
     @RequestMapping(value = "/editBook",
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String editBook(ModelMap modelMap, ConcreteBook concreteBook)
+    public String editBook(ModelMap modelMap, Book book)
             throws SQLException, ClassNotFoundException {
         //----------------------update book---------------------//
         DBConnection dbConnection = DBConnection.newInstance();
         dbConnection.executeUpdate(
                 "update book set " +
-                        "name='" + concreteBook.getName() + "'," +
-                        "author='" + concreteBook.getAuthor() + "'," +
-                        "publisher='" + concreteBook.getPublisher() + "'," +
-                        "release_year='" + concreteBook.getReleaseYear() + "'," +
-                        "page_numbers='" + concreteBook.getPagesNumber() + "'" +
-                        "where id=" + concreteBook.getId());
+                        "name='" + book.getName() + "'," +
+                        "author='" + book.getAuthor() + "'," +
+                        "publisher='" + book.getPublisher() + "'," +
+                        "release_year='" + book.getReleaseYear() + "'," +
+                        "page_numbers='" + book.getPagesNumber() + "'" +
+                        "where id=" + book.getId());
 
         dbConnection.closeConnection();
 
-        Arrays.asList(concreteBook.getConcreteProductShopArr()).forEach(x -> {
+        Arrays.asList(book.getConcreteProductInShopArr()).forEach(x -> {
             try {
                 if (x != null) editConcrete(x);
             } catch (SQLException e) {
@@ -504,20 +462,20 @@ public class HomeController {
     @RequestMapping(value = "/editNewspaper",
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String editNewspaper(ModelMap modelMap, ConcreteNewspaper concreteNewspaper)
+    public String editNewspaper(ModelMap modelMap, Newspaper newspaper)
             throws SQLException, ClassNotFoundException {
         //----------------------update book---------------------//
         DBConnection dbConnection = DBConnection.newInstance();
         dbConnection.executeUpdate(
                 "update newspaper set " +
-                        "name='" + concreteNewspaper.getName() + "'," +
-                        "release_year='" + concreteNewspaper.getReleaseYear() + "'," +
-                        "page_numbers='" + concreteNewspaper.getIssue() + "'" +
-                        "where id=" + concreteNewspaper.getId());
+                        "name='" + newspaper.getName() + "'," +
+                        "release_year='" + newspaper.getReleaseYear() + "'," +
+                        "issue='" + newspaper.getIssue() + "'" +
+                        "where id=" + newspaper.getId());
 
         dbConnection.closeConnection();
 
-        Arrays.asList(concreteNewspaper.getConcreteProductShopArr()).forEach(x -> {
+        Arrays.asList(newspaper.getConcreteProductInShopArr()).forEach(x -> {
             try {
                 if (x != null) editConcrete(x);
             } catch (SQLException e) {
@@ -559,21 +517,21 @@ public class HomeController {
     @RequestMapping(value = "/editMagazine",
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String editMagazine(ModelMap modelMap, ConcreteMagazine concreteMagazine)
+    public String editMagazine(ModelMap modelMap, Magazine magazine)
             throws SQLException, ClassNotFoundException {
         //----------------------update book---------------------//
         DBConnection dbConnection = DBConnection.newInstance();
         dbConnection.executeUpdate(
-                "update newspaper set " +
-                        "name='" + concreteMagazine.getName() + "'," +
-                        "release_year='" + concreteMagazine.getReleaseYear() + "'," +
-                        "isuue='" + concreteMagazine.getIssue() + "'," +
-                        "page_numbers='" + concreteMagazine.getPagesNumber() + "'" +
-                        "where id=" + concreteMagazine.getId());
+                "update magazine set " +
+                        "name='" + magazine.getName() + "', " +
+                        "release_year='" + magazine.getReleaseYear() + "', " +
+                        "issue='" + magazine.getIssue() + "', " +
+                        "page_numbers='" + magazine.getPagesNumber() + "' " +
+                        "where id=" + magazine.getId());
 
         dbConnection.closeConnection();
 
-        Arrays.asList(concreteMagazine.getConcreteProductShopArr()).forEach(x -> {
+        Arrays.asList(magazine.getConcreteProductInShopArr()).forEach(x -> {
             try {
                 if (x != null) editConcrete(x);
             } catch (SQLException e) {
@@ -585,22 +543,21 @@ public class HomeController {
         return admin(modelMap);
     }
 
-
-    private void editConcrete(ConcreteProductShop concreteProductShop) throws SQLException, ClassNotFoundException {
+    private void editConcrete(ConcreteProductInShop concreteProductInShop) throws SQLException, ClassNotFoundException {
         DBConnection dbConnection = DBConnection.newInstance();
         dbConnection.executeUpdate(
-                "update concrete_" + concreteProductShop.getItemName().toLowerCase() + "_shop set " +
-                        "price='" + concreteProductShop.getPrice() + "', " +
-                        "copies_number='" + concreteProductShop.getCopiesNumber() + "' " +
-                        "where (" + concreteProductShop.getItemName().toLowerCase() +
-                        "_id=" + concreteProductShop.getItemId() +
-                        " and shop_id=" + concreteProductShop.getShopId() + ")");
+                "update concrete_" + concreteProductInShop.getItemName().toLowerCase() + "_shop set " +
+                        "price='" + concreteProductInShop.getPrice() + "', " +
+                        "copies_number='" + concreteProductInShop.getCopiesNumber() + "' " +
+                        "where (" + concreteProductInShop.getItemName().toLowerCase() +
+                        "_id=" + concreteProductInShop.getItemId() +
+                        " and shop_id=" + concreteProductInShop.getShopId() + ")");
 
         dbConnection.closeConnection();
     }
 
     @RequestMapping(value = "/deleteBook")
-    public String deleteBook(ModelMap modelMap, int id) {
+    public String deleteBook(ModelMap modelMap, int id) throws SQLException, ClassNotFoundException {
 
         try {
             DBConnection dbConnection = DBConnection.newInstance();
@@ -613,7 +570,41 @@ public class HomeController {
             return error(modelMap, "cannot delete");
         }
 
-        return "admin";
+        return admin(modelMap);
+    }
+
+    @RequestMapping(value = "/deleteNewspaper")
+    public String deleteNewspaper(ModelMap modelMap, int id) throws SQLException, ClassNotFoundException {
+
+        try {
+            DBConnection dbConnection = DBConnection.newInstance();
+            dbConnection.executeQuery(
+                    "delete from newspaper where id=" + id);
+            dbConnection.closeConnection();
+        } catch (SQLException e) {
+            return error(modelMap, "cannot delete");
+        } catch (ClassNotFoundException e) {
+            return error(modelMap, "cannot delete");
+        }
+
+        return admin(modelMap);
+    }
+
+    @RequestMapping(value = "/deleteMagazine")
+    public String deleteMagazine(ModelMap modelMap, int id) throws SQLException, ClassNotFoundException {
+
+        try {
+            DBConnection dbConnection = DBConnection.newInstance();
+            dbConnection.executeQuery(
+                    "delete from magazine where id=" + id);
+            dbConnection.closeConnection();
+        } catch (SQLException e) {
+            return error(modelMap, "cannot delete");
+        } catch (ClassNotFoundException e) {
+            return error(modelMap, "cannot delete");
+        }
+
+        return admin(modelMap);
     }
 
     private void setAvailabilityModel(String itemType, int id, ModelMap modelMap) throws SQLException, ClassNotFoundException {
@@ -647,7 +638,7 @@ public class HomeController {
                         "(concrete_" + itemType + "_shop." + itemType + "_id=" + id + ") & (concrete_" + itemType + "_shop.copies_number>0))\n" +
                         "order by shop.chain_store_id");
         ArrayList<Shop> shops = new ArrayList<Shop>();
-        ArrayList<ConcreteNewspaperShop> priceCopies = new ArrayList<ConcreteNewspaperShop>();
+        ArrayList<ConcreteProductInShop> priceCopies = new ArrayList<ConcreteProductInShop>();
         while (resultSet.next()) {
             if (chainStores.size() > 0) {
                 int price = resultSet.getInt(3);
@@ -659,11 +650,11 @@ public class HomeController {
                             .setAddress(resultSet.getString(2));
                     shops.add(shop);
 
-                    ConcreteNewspaperShop concrNewspSh = new ConcreteNewspaperShop()
+                    ConcreteProductInShop concreteProductInShop = new ConcreteProductInShop()
                             .setShopId(shopId)
                             .setPrice(price)
                             .setCopiesNumber(resultSet.getInt(4));
-                    priceCopies.add(concrNewspSh);
+                    priceCopies.add(concreteProductInShop);
                 }
             }
         }
@@ -675,5 +666,189 @@ public class HomeController {
         modelMap.addAttribute("priceCopiesList", priceCopies);
         dbConnection.closeConnection();
     }
+
+    @RequestMapping(value = "/addChainStore", method = RequestMethod.GET)
+    public String addChainStore(ModelMap modelMap){
+       ChainStore chainStore=new ChainStore();
+        modelMap.addAttribute("chainStore", chainStore);
+        return "addChainStore";
+    }
+
+    @RequestMapping(value = "/addChainStore", method = RequestMethod.POST)
+    public String addChainStore(ModelMap modelMap, ChainStore chainStore) throws SQLException, ClassNotFoundException {
+
+        DBConnection dbConnection = DBConnection.newInstance();
+        dbConnection.executeUpdate(
+                "insert into `chain_store` " +
+                        "(`id`, `name`) \n" +
+                        "value (" +
+                        "NULL, " +
+                        "'" + chainStore.getName() + "');");
+        dbConnection.closeConnection();
+        return admin(modelMap);
+    }
+
+    @RequestMapping(value = "/editChainStore", method = RequestMethod.GET)
+    public String editChainStore(ModelMap modelMap, int id) throws SQLException, ClassNotFoundException {
+
+        DBConnection dbConnection = DBConnection.newInstance();
+        ResultSet resultSet = dbConnection.executeQuery(
+                "select id, name" +
+                        " from chain_store " +
+                        "where id=" + id);
+        ChainStore chainStore=new ChainStore();
+        while (resultSet.next()) {
+           chainStore
+                    .setId(resultSet.getInt(1))
+                    .setName(resultSet.getString(2));
+        }
+
+        modelMap.addAttribute("chainStore", chainStore);
+        dbConnection.closeConnection();
+        return "editChainStore";
+    }
+
+    @RequestMapping(value = "/editChainStore", method = RequestMethod.POST)
+    public String editChainStore(ModelMap modelMap, ChainStore chainStore)
+            throws SQLException, ClassNotFoundException {
+
+        DBConnection dbConnection = DBConnection.newInstance();
+        dbConnection.executeUpdate(
+                "update chain_store set " +
+                        "name='" + chainStore.getName() + "'" +
+                        "where id=" + chainStore.getId());
+
+        dbConnection.closeConnection();
+
+        return admin(modelMap);
+    }
+
+    @RequestMapping(value = "/deleteChainStore")
+    public String deleteChainStore(ModelMap modelMap, int id) throws SQLException, ClassNotFoundException {
+
+        try {
+            DBConnection dbConnection = DBConnection.newInstance();
+            dbConnection.executeQuery(
+                    "delete from chain_store where id=" + id);
+            dbConnection.closeConnection();
+        } catch (SQLException e) {
+            return error(modelMap, "cannot delete");
+        } catch (ClassNotFoundException e) {
+            return error(modelMap, "cannot delete");
+        }
+
+        return admin(modelMap);
+    }
+
+    @RequestMapping(value = "/addShop", method = RequestMethod.GET)
+    public String addShop(ModelMap modelMap)throws SQLException, ClassNotFoundException{
+        Shop shop=new Shop();
+        modelMap.addAttribute("shop", shop);
+
+        //-------------------chain_stores----------------------------------//
+       DBConnection dbConnection = DBConnection.newInstance();
+        ResultSet resultSet = dbConnection.executeQuery("select id, name from chain_store");
+
+        ArrayList<ChainStore> chainStores = new ArrayList<>();
+        while (resultSet.next()) {
+            ChainStore chainStore = new ChainStore()
+                    .setId(resultSet.getInt(1))
+                    .setName(resultSet.getString(2));
+            chainStores.add(chainStore);
+        }
+        modelMap.addAttribute("chainStores", chainStores);
+        dbConnection.closeConnection();
+        return "addShop";
+    }
+
+    @RequestMapping(value = "/addShop", method = RequestMethod.POST)
+    public String addShop(ModelMap modelMap,Shop shop)
+            throws SQLException, ClassNotFoundException {
+
+            DBConnection dbConnection = DBConnection.newInstance();
+            dbConnection.executeUpdate(
+                    "insert into shop" +
+                            "(`id`, `address`, `chain_store_id`) \n" +
+                            "value (" +
+                            "'" + shop.getId() + "', " +
+                            "'" + shop.getAddress() + "', " +
+                            "'" + shop.getChainStoreId() + "');");
+
+            dbConnection.closeConnection();
+         return admin(modelMap);
+        }
+
+    @RequestMapping(value = "/editShop", method = RequestMethod.GET)
+    public String editShop(ModelMap modelMap, int id) throws SQLException, ClassNotFoundException {
+
+        DBConnection dbConnection = DBConnection.newInstance();
+        ResultSet resultSet = dbConnection.executeQuery(
+                "select id, address, chain_store_id" +
+                        " from shop " +
+                        "where id=" + id);
+        Shop shop=new Shop();
+        while (resultSet.next()) {
+            shop
+                    .setId(resultSet.getInt(1))
+                    .setAddress(resultSet.getString(2))
+                    .setChainStoreId(resultSet.getInt(3));
+        }
+
+        modelMap.addAttribute("shop", shop);
+        dbConnection.closeConnection();
+
+        //--------------------chain_store------------------//
+        dbConnection = DBConnection.newInstance();
+        resultSet = dbConnection.executeQuery("select id, name from chain_store\n" +
+                "where id="+shop.getChainStoreId());
+
+
+        ArrayList<ChainStore> chainStores = new ArrayList<ChainStore>();
+        while (resultSet.next()) {
+            ChainStore chainStore = new ChainStore()
+                    .setId(resultSet.getInt(1))
+                    .setName(resultSet.getString(2));
+            chainStores.add(chainStore);
+        }
+        modelMap.addAttribute("chainStores", chainStores);
+        dbConnection.closeConnection();
+
+        return "editShop";
+    }
+
+    @RequestMapping(value = "/editShop", method = RequestMethod.POST)
+    public String editShop(ModelMap modelMap, Shop shop)
+            throws SQLException, ClassNotFoundException {
+
+        DBConnection dbConnection = DBConnection.newInstance();
+        dbConnection.executeUpdate(
+                "update shop set " +
+                        "address='" + shop.getAddress() + "', " +
+                        "chain_store_id='" + shop.getChainStoreId() + "' " +
+                        "where id=" + shop.getId());
+
+        dbConnection.closeConnection();
+
+        return admin(modelMap);
+    }
+
+    @RequestMapping(value = "/deleteShop")
+    public String deleteShop(ModelMap modelMap, int id) throws SQLException, ClassNotFoundException {
+
+        try {
+            DBConnection dbConnection = DBConnection.newInstance();
+            dbConnection.executeQuery(
+                    "delete from shop where id=" + id);
+            dbConnection.closeConnection();
+        } catch (SQLException e) {
+            return error(modelMap, "cannot delete");
+        } catch (ClassNotFoundException e) {
+            return error(modelMap, "cannot delete");
+        }
+
+        return admin(modelMap);
+    }
+
+
 }
 

@@ -22,7 +22,7 @@
     <p><b>Год издания:</b><br>
         <input name="releaseYear" min="1" max="${maxYear}" value="${newspaper.getReleaseYear()}" type="number"/>
     </p>
-    <p><b>Количество страниц:</b><br>
+    <p><b>Номер:</b><br>
         <input name="issue" min="3" value="${newspaper.getIssue()}" type="number"/>
     </p>
 
