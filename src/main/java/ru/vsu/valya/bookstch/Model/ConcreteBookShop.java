@@ -1,10 +1,19 @@
 package ru.vsu.valya.bookstch.Model;
 
-public class ConcreteBookShop {
+public class ConcreteBookShop extends  ConcreteProductShop{
     private int bookId;
     private  int shopId;
     private  int price;
     private  int copiesNumber;
+
+    public ConcreteBookShop(){}
+
+    public ConcreteBookShop(int bookId, int shopId, int price, int copiesNumber) {
+        this.bookId = bookId;
+        this.shopId = shopId;
+        this.price = price;
+        this.copiesNumber = copiesNumber;
+    }
 
     public  ConcreteBookShop setBookId(int bookId) {
         this.bookId = bookId;

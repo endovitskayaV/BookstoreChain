@@ -1,10 +1,9 @@
 package ru.vsu.valya.bookstch.Controller;
 
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import ru.vsu.valya.bookstch.Model.*;
@@ -15,6 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 
 @Controller
 public class HomeController {
@@ -142,7 +142,7 @@ public class HomeController {
         while (resultSet.next()) {
             Newspaper newspaper = new Newspaper()
                     .setName(resultSet.getString(2))
-                    .setReleaseDate(resultSet.getDate(3))
+                    .setReleaseYear(resultSet.getInt(3))
                     .setIssue(resultSet.getInt(4));
             modelMap.addAttribute("newspaper", newspaper);
         }
@@ -222,9 +222,9 @@ public class HomeController {
 
         dbConnection = DBConnection.newInstance();
         resultSet = dbConnection.executeQuery("select * from concrete_book_shop");
-        ArrayList<ConcreteBookShop> concreteBooksShops=new ArrayList<ConcreteBookShop>();
-        while (resultSet.next()){
-            ConcreteBookShop concreteBookShop=new ConcreteBookShop()
+        ArrayList<ConcreteBookShop> concreteBooksShops = new ArrayList<ConcreteBookShop>();
+        while (resultSet.next()) {
+            ConcreteBookShop concreteBookShop = new ConcreteBookShop()
                     .setBookId(resultSet.getInt(1))
                     .setShopId(resultSet.getInt(2))
                     .setPrice(resultSet.getInt(3))
@@ -236,9 +236,9 @@ public class HomeController {
 
         dbConnection = DBConnection.newInstance();
         resultSet = dbConnection.executeQuery("select * from concrete_newspaper_shop");
-        ArrayList<ConcreteNewspaperShop> concreteNewspapersShops=new ArrayList<ConcreteNewspaperShop>();
-        while (resultSet.next()){
-            ConcreteNewspaperShop concreteNewspaperShop=new ConcreteNewspaperShop()
+        ArrayList<ConcreteNewspaperShop> concreteNewspapersShops = new ArrayList<ConcreteNewspaperShop>();
+        while (resultSet.next()) {
+            ConcreteNewspaperShop concreteNewspaperShop = new ConcreteNewspaperShop()
                     .setNewspaperId(resultSet.getInt(1))
                     .setShopId(resultSet.getInt(2))
                     .setPrice(resultSet.getInt(3))
@@ -250,9 +250,9 @@ public class HomeController {
 
         dbConnection = DBConnection.newInstance();
         resultSet = dbConnection.executeQuery("select * from concrete_magazine_shop");
-        ArrayList<ConcreteMagazineShop> concreteMagazinesShops=new ArrayList<ConcreteMagazineShop>();
-        while (resultSet.next()){
-            ConcreteMagazineShop concreteMagazineShop=new ConcreteMagazineShop()
+        ArrayList<ConcreteMagazineShop> concreteMagazinesShops = new ArrayList<ConcreteMagazineShop>();
+        while (resultSet.next()) {
+            ConcreteMagazineShop concreteMagazineShop = new ConcreteMagazineShop()
                     .setMagazineId(resultSet.getInt(1))
                     .setShopId(resultSet.getInt(2))
                     .setPrice(resultSet.getInt(3))
@@ -266,38 +266,165 @@ public class HomeController {
     }
 
     @RequestMapping(value = "/addBook", method = RequestMethod.GET)
-    public String addBook(ModelMap modelMap){
-        Book book=new Book().setPagesNumber(3).setReleaseYear(1);
+    public String addBook(ModelMap modelMap) {
+        Book book = new Book();
         modelMap.addAttribute("book", book);
         modelMap.addAttribute("maxYear", Calendar.getInstance().get(Calendar.YEAR));
         return "addBook";
     }
 
     @RequestMapping(value = "/addBook", method = RequestMethod.POST)
-    public String addBook(ModelMap modelMap, Book book)  throws SQLException, ClassNotFoundException{
+    public String addBook(ModelMap modelMap, Book book) throws SQLException, ClassNotFoundException {
 
         DBConnection dbConnection = DBConnection.newInstance();
         dbConnection.executeUpdate(
                 "insert into `Book` " +
-                "(`id`, `name`, `author`, `publisher`, `release_year`, `page_numbers`) \n" +
-                "value (" +
-                       "NULL, "+
-                        "'" + book.getName()+"', "+
-                        "'" +book.getAuthor()+"', "+
-                        "'" +book.getPublisher()+"', "+
-                        "'" +book.getReleaseYear()+"', "+
-                        "'" +book.getPagesNumber()+"');");
+                        "(`id`, `name`, `author`, `publisher`, `release_year`, `page_numbers`) \n" +
+                        "value (" +
+                        "NULL, " +
+                        "'" + book.getName() + "', " +
+                        "'" + book.getAuthor() + "', " +
+                        "'" + book.getPublisher() + "', " +
+                        "'" + book.getReleaseYear() + "', " +
+                        "'" + book.getPagesNumber() + "');");
         dbConnection.closeConnection();
         return admin(modelMap);
     }
 
+    @RequestMapping(value = "/addNewspaper", method = RequestMethod.GET)
+    public String addNewspaper(ModelMap modelMap) {
+       Newspaper newspaper= new Newspaper();
+        modelMap.addAttribute("newspaper", newspaper);
+        modelMap.addAttribute("maxYear", Calendar.getInstance().get(Calendar.YEAR));
+        return "addNewspaper";
+    }
+
+    @RequestMapping(value = "/addNewspaper", method = RequestMethod.POST)
+    public String addNewspaper(ModelMap modelMap, Newspaper newspaper) throws SQLException, ClassNotFoundException {
+
+        DBConnection dbConnection = DBConnection.newInstance();
+        dbConnection.executeUpdate(
+                "insert into `Newspaper` " +
+                        "(`id`, `name`, `release_year`, `issue`) \n" +
+                        "value (" +
+                        "NULL, " +
+                        "'" + newspaper.getName() + "', " +
+                        "'" + newspaper.getReleaseYear() + "', " +
+                        "'" + newspaper.getIssue() + "');");
+        dbConnection.closeConnection();
+        return admin(modelMap);
+    }
+
+    @RequestMapping(value = "/addMagazine", method = RequestMethod.GET)
+    public String addMagazine(ModelMap modelMap) {
+        Magazine magazine=new Magazine();
+        modelMap.addAttribute("magazine", magazine);
+        modelMap.addAttribute("maxYear", Calendar.getInstance().get(Calendar.YEAR));
+        return "addMagazine";
+    }
+
+    @RequestMapping(value = "/addMagazine", method = RequestMethod.POST)
+    public String addMagazine(ModelMap modelMap, Magazine magazine) throws SQLException, ClassNotFoundException {
+
+        DBConnection dbConnection = DBConnection.newInstance();
+        dbConnection.executeUpdate(
+                "insert into `Magazine` " +
+                        "(`id`, `name`, `release_year`, `issue`, `page_numbers`) \n" +
+                        "value (" +
+                        "NULL, " +
+                        "'" + magazine.getName() + "', " +
+                        "'" + magazine.getReleaseYear() + "', " +
+                        "'" + magazine.getIssue() +
+                        "'" + magazine.getPagesNumber() +"');");
+        dbConnection.closeConnection();
+        return admin(modelMap);
+    }
+
+
+    @RequestMapping(value = "/addAvailabilityInfo", method = RequestMethod.GET)
+    public String addAvailabilityInfo(ModelMap modelMap, int itemId, String itemName, String backAddr)
+            throws SQLException, ClassNotFoundException {
+        ConcreteProductShop concreteProductShop = new ConcreteProductShop()
+                .setItemId(itemId)
+                .setItemName(itemName);
+        modelMap.addAttribute("concreteProductShop", concreteProductShop);
+
+        //-------------------shops that can be added----------------------------------//
+        DBConnection dbConnection = DBConnection.newInstance();
+        ResultSet resultSet = dbConnection.executeQuery("select id, address, chain_store_id from shop\n" +
+                "where id not in (select shop_id from concrete_" + itemName + "_shop\n" +
+                "where book_id=" + itemId + " and copies_number>0);");
+
+
+        ArrayList<Shop> shops = new ArrayList<Shop>();
+        while (resultSet.next()) {
+            Shop shop = new Shop()
+                    .setId(resultSet.getInt(1))
+                    .setAddress(resultSet.getString(2))
+                    .setChainStoreId(resultSet.getInt(3));
+            shops.add(shop);
+        }
+        modelMap.addAttribute("shops", shops);
+        modelMap.addAttribute("backAddr", backAddr);
+        dbConnection.closeConnection();
+
+
+        //-------------------chain_stores  that can be added----------------------------------//
+        dbConnection = DBConnection.newInstance();
+        resultSet = dbConnection.executeQuery("select id, name from chain_store\n" +
+                "where id in (select chain_store_id from shop\n" +
+                "where id not in (select shop_id from concrete_" + itemName + "_shop\n" +
+                "where book_id=" + itemId + " and copies_number>0));");
+
+
+        ArrayList<ChainStore> chainStores = new ArrayList<ChainStore>();
+        while (resultSet.next()) {
+            ChainStore chainStore = new ChainStore()
+                    .setId(resultSet.getInt(1))
+                    .setName(resultSet.getString(2));
+            chainStores.add(chainStore);
+        }
+        modelMap.addAttribute("chainStores", chainStores);
+        dbConnection.closeConnection();
+
+
+        return "addAvailabilityInfo";
+    }
+
+    @RequestMapping(value = "/addAvailabilityInfo", method = RequestMethod.POST)
+    public String addAvailabilityInfo(ModelMap modelMap, String backAddr,
+                                      ConcreteProductShop concreteProductShop)
+            throws SQLException, ClassNotFoundException {
+        if(concreteProductShop.getCopiesNumber()>0) {
+            DBConnection dbConnection = DBConnection.newInstance();
+            dbConnection.executeUpdate(
+                    "insert into " +
+                            "`concrete_" + concreteProductShop.getItemName().toLowerCase() + "_shop` " +
+                            "(`book_id`, `shop_id`, `price`, `copies_number`) \n" +
+                            "value (" +
+                            "'" + concreteProductShop.getItemId() + "', " +
+                            "'" + concreteProductShop.getShopId() + "', " +
+                            "'" + concreteProductShop.getPrice() + "', " +
+                            "'" + concreteProductShop.getCopiesNumber() + "');");
+
+            dbConnection.closeConnection();
+        }
+        switch (backAddr){
+            case "editBook": return editBook(modelMap,concreteProductShop.getItemId());
+            case "addBook": return addBook(modelMap);
+            default:       return admin(modelMap);
+        }
+    }
+
     @RequestMapping(value = "/editBook", method = RequestMethod.GET)
     public String editBook(ModelMap modelMap, int id) throws SQLException, ClassNotFoundException {
+
+        //-----------------book---------------------------------------------------//
         DBConnection dbConnection = DBConnection.newInstance();
         ResultSet resultSet = dbConnection.executeQuery(
                 "select id, name, author, publisher, release_year, page_numbers" +
                         " from book " +
-                        "where id="+id);
+                        "where id=" + id);
         Book book = new Book();
         while (resultSet.next()) {
             book
@@ -308,44 +435,183 @@ public class HomeController {
                     .setReleaseYear(resultSet.getInt(5))
                     .setPagesNumber(resultSet.getInt(6));
         }
+
         modelMap.addAttribute("book", book);
         dbConnection.closeConnection();
 
+        setAvailabilityModel("book", book.getId(), modelMap);
+        modelMap.addAttribute("backAddr", "editBook");
         return "editBook";
     }
 
     @RequestMapping(value = "/editBook",
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String editBook(ModelMap modelMap, Book book) throws SQLException, ClassNotFoundException {
+    public String editBook(ModelMap modelMap, ConcreteBook concreteBook)
+            throws SQLException, ClassNotFoundException {
+        //----------------------update book---------------------//
         DBConnection dbConnection = DBConnection.newInstance();
         dbConnection.executeUpdate(
                 "update book set " +
-                        "name='"+ book.getName()+"',"+
-                        "author='"+ book.getAuthor()+"',"+
-                        "publisher='"+ book.getPublisher()+"',"+
-                        "release_year='"+ book.getReleaseYear()+"',"+
-                        "page_numbers='"+ book.getPagesNumber()+"'"+
-                        "where id="+book.getId());
+                        "name='" + concreteBook.getName() + "'," +
+                        "author='" + concreteBook.getAuthor() + "'," +
+                        "publisher='" + concreteBook.getPublisher() + "'," +
+                        "release_year='" + concreteBook.getReleaseYear() + "'," +
+                        "page_numbers='" + concreteBook.getPagesNumber() + "'" +
+                        "where id=" + concreteBook.getId());
 
         dbConnection.closeConnection();
+
+        Arrays.asList(concreteBook.getConcreteProductShopArr()).forEach(x -> {
+            try {
+                if (x != null) editConcrete(x);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        });
         return admin(modelMap);
     }
 
-    @RequestMapping(value = "/deleteBook")
-    public String deleteBook(ModelMap modelMap, int id){
+    @RequestMapping(value = "/editNewspaper", method = RequestMethod.GET)
+    public String editNewspaper(ModelMap modelMap, int id) throws SQLException, ClassNotFoundException {
 
-        try{
+        //-----------------newspaper---------------------------------------------------//
+        DBConnection dbConnection = DBConnection.newInstance();
+        ResultSet resultSet = dbConnection.executeQuery(
+                "select id, name,  release_year, issue" +
+                        " from newspaper " +
+                        "where id=" + id);
+      Newspaper newspaper=new Newspaper();
+        while (resultSet.next()) {
+           newspaper
+                    .setId(resultSet.getInt(1))
+                    .setName(resultSet.getString(2))
+                    .setReleaseYear(resultSet.getInt(3))
+                    .setIssue(resultSet.getInt(4));
+        }
+
+        modelMap.addAttribute("newspaper", newspaper);
+        dbConnection.closeConnection();
+
+        setAvailabilityModel("newspaper", newspaper.getId(), modelMap);
+        modelMap.addAttribute("backAddr", "editNewspaper");
+        return "editNewspaper";
+    }
+
+
+    @RequestMapping(value = "/editNewspaper",
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public String editNewspaper(ModelMap modelMap, ConcreteNewspaper concreteNewspaper)
+            throws SQLException, ClassNotFoundException {
+        //----------------------update book---------------------//
+        DBConnection dbConnection = DBConnection.newInstance();
+        dbConnection.executeUpdate(
+                "update newspaper set " +
+                        "name='" + concreteNewspaper.getName() + "'," +
+                        "release_year='" + concreteNewspaper.getReleaseYear() + "'," +
+                        "page_numbers='" + concreteNewspaper.getIssue() + "'" +
+                        "where id=" + concreteNewspaper.getId());
+
+        dbConnection.closeConnection();
+
+        Arrays.asList(concreteNewspaper.getConcreteProductShopArr()).forEach(x -> {
+            try {
+                if (x != null) editConcrete(x);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        });
+        return admin(modelMap);
+    }
+
+    @RequestMapping(value = "/editMagazine", method = RequestMethod.GET)
+    public String editMagazine(ModelMap modelMap, int id) throws SQLException, ClassNotFoundException {
+
+        //-----------------magazine---------------------------------------------------//
+        DBConnection dbConnection = DBConnection.newInstance();
+        ResultSet resultSet = dbConnection.executeQuery(
+                "select id, name,  release_year, issue,  page_numbers" +
+                        " from magazine " +
+                        "where id=" + id);
+      Magazine magazine=new Magazine();
+        while (resultSet.next()) {
+            magazine
+                    .setId(resultSet.getInt(1))
+                    .setName(resultSet.getString(2))
+                    .setReleaseYear(resultSet.getInt(3))
+                    .setIssue(resultSet.getInt(4))
+                    .setPagesNumber(resultSet.getInt(5));
+        }
+
+        modelMap.addAttribute("magazine", magazine);
+        dbConnection.closeConnection();
+
+        setAvailabilityModel("magazine", magazine.getId(), modelMap);
+        modelMap.addAttribute("backAddr", "editMagazine");
+        return "editMagazine";
+    }
+
+    @RequestMapping(value = "/editMagazine",
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public String editMagazine(ModelMap modelMap, ConcreteMagazine concreteMagazine)
+            throws SQLException, ClassNotFoundException {
+        //----------------------update book---------------------//
+        DBConnection dbConnection = DBConnection.newInstance();
+        dbConnection.executeUpdate(
+                "update newspaper set " +
+                        "name='" + concreteMagazine.getName() + "'," +
+                        "release_year='" + concreteMagazine.getReleaseYear() + "'," +
+                        "isuue='" + concreteMagazine.getIssue() + "'," +
+                        "page_numbers='" + concreteMagazine.getPagesNumber() + "'" +
+                        "where id=" + concreteMagazine.getId());
+
+        dbConnection.closeConnection();
+
+        Arrays.asList(concreteMagazine.getConcreteProductShopArr()).forEach(x -> {
+            try {
+                if (x != null) editConcrete(x);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        });
+        return admin(modelMap);
+    }
+
+
+    private void editConcrete(ConcreteProductShop concreteProductShop) throws SQLException, ClassNotFoundException {
+        DBConnection dbConnection = DBConnection.newInstance();
+        dbConnection.executeUpdate(
+                "update concrete_" + concreteProductShop.getItemName().toLowerCase() + "_shop set " +
+                        "price='" + concreteProductShop.getPrice() + "', " +
+                        "copies_number='" + concreteProductShop.getCopiesNumber() + "' " +
+                        "where (" + concreteProductShop.getItemName().toLowerCase() +
+                        "_id=" + concreteProductShop.getItemId() +
+                        " and shop_id=" + concreteProductShop.getShopId() + ")");
+
+        dbConnection.closeConnection();
+    }
+
+    @RequestMapping(value = "/deleteBook")
+    public String deleteBook(ModelMap modelMap, int id) {
+
+        try {
             DBConnection dbConnection = DBConnection.newInstance();
             dbConnection.executeQuery(
-                "delete from book where id=" + id);
-            dbConnection.closeConnection();}
-                catch (SQLException e){
-                    return error(modelMap, "cannot delete");
-                }
-                catch (ClassNotFoundException e){
-                    return error(modelMap, "cannot delete");
-                }
+                    "delete from book where id=" + id);
+            dbConnection.closeConnection();
+        } catch (SQLException e) {
+            return error(modelMap, "cannot delete");
+        } catch (ClassNotFoundException e) {
+            return error(modelMap, "cannot delete");
+        }
 
         return "admin";
     }
@@ -402,6 +668,9 @@ public class HomeController {
             }
         }
 
+        modelMap.addAttribute("i", 0);
+        modelMap.addAttribute("itemName", itemType.toLowerCase());
+        modelMap.addAttribute("itemId", id);
         modelMap.addAttribute("shops", shops);
         modelMap.addAttribute("priceCopiesList", priceCopies);
         dbConnection.closeConnection();

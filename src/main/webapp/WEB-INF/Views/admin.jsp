@@ -8,30 +8,29 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
-<form>
 <head>
     <title>Admin</title>
 </head>
 <body>
+
 Книги<br>
-<a href="addBook"> add</a>
+<a href="addBook"> <b>+</b></a>
 <table border="1">
     <tr><td>id</td><td>Название</td></tr>
     <c:forEach var="book" items="${books}">
         <tr>
-            <td>${book.getId()}</td>
             <td>
-                <a href="/bookInfo?id=${book.getId()}"> ${book.getName()}</a><br>
+                <a href="editBook?id=${book.getId()}">  ${book.getName()}</a><br>
                     ${book.getAuthor()}
             </td>
-            <td><a href="editBook?id=${book.getId()}"> edit</a></td>
             <td> <a href="deleteBook?id=${book.getId()}" onclick = "return confirm('Удалить?');" >Удалить</a></td>
         </tr>
     </c:forEach>
 </table>
 <br><br>
+
 Газеты<br>
-<a href="addRow"> add</a>
+<a href="addBook"> <b>+</b></a>
 <table border="1">
     <tr><td>id</td><td>Название</td></tr>
     <c:forEach var="newspaper" items="${newspapers}" >
@@ -48,7 +47,7 @@
 </table>
 <br> <br>
 Журналы<br>
-<a href="addRow"> add</a>
+<a href="addBook"> <b>+</b></a>
 <table border="1">
     <tr><td>id</td><td>Название</td></tr>
     <c:forEach var="magazine" items="${magazines}" >
@@ -80,16 +79,14 @@
 </table>
 <br><br>
 Сети магизинов<br>
-<a href="addRow"> add</a>
+<a href="addBook"> <b>+</b></a>
 <table border="1">
     <tr><td>id</td><td>Название</td></tr>
     <c:forEach var="chainStore" items="${chainStores}" >
         <tr>
-            <td>${chainStore.getId()}</td>
             <td>
                 <a href="bookInfo?id=${chainStore.getId()}"> ${chainStore.getName()}</a>
             </td>
-            <td><a href=""> edit</a></td>
             <td> <a href=""> delete</a></td>
         </tr>
     </c:forEach>
@@ -140,8 +137,4 @@
     </c:forEach>
 </table>
 </body>
-</form>
-<a href="">Отменить</a>
-<button type="reset"> Отмена</button>
-<button type="submit">Сохранить</button>
 </html>

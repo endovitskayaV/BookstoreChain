@@ -34,8 +34,17 @@
         <input name="pagesNumber" value="${book.getPagesNumber()}" type="number" min="3"/>
     </p>
 
+
+    <a href="addAvailabilityInfo?itemId=${book.getId()}&itemName=book&backAddr=${backAddr}"
+       style="text-decoration: none; font-size: 20pt;">
+        <b>+</b></a>
+
+    <c:import url="editableCopiesPrice.jsp"/>
+
+    <p>
     <button type="reset"> Отмена</button>
     <button type="submit">Сохранить</button>
+    </p>
 </form>
 
 

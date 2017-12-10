@@ -9,8 +9,8 @@
         <module name="BookstoreChain" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="BookstoreChain" target="1.5" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="BookstoreChain" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

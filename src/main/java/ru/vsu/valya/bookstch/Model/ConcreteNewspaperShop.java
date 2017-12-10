@@ -1,6 +1,6 @@
 package ru.vsu.valya.bookstch.Model;
 
-public class ConcreteNewspaperShop {
+public class ConcreteNewspaperShop extends  ConcreteProductShop {
     private int newspaperId;
     private  int shopId;
     private  int price;

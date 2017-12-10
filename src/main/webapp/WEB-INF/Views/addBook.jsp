@@ -32,6 +32,7 @@
         <input name="pagesNumber" min="3" value="${book.getPagesNumber()}" type="number"/>
     </p>
 
+
     <button type="reset"> Отмена</button>
     <button type="submit">Сохранить</button>
 </form>

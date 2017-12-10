@@ -1,11 +1,10 @@
 package ru.vsu.valya.bookstch.Model;
 
-import java.util.Date;
 
 public class Newspaper {
     private  int id;
     private  String name;
-    private Date releaseDate;
+    private int releaseYear;
     private int issue;
 
     public int getId() {
@@ -26,12 +25,12 @@ public class Newspaper {
         return this;
     }
 
-    public Date getReleaseDate() {
-        return releaseDate;
+    public int getReleaseYear() {
+        return releaseYear;
     }
 
-    public Newspaper setReleaseDate(Date releaseDate) {
-        this.releaseDate = releaseDate;
+    public Newspaper setReleaseYear(int releaseYear) {
+        this.releaseYear = releaseYear;
         return this;
     }
 
