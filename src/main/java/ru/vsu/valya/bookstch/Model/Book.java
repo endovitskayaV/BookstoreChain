@@ -11,6 +11,17 @@ public class Book {
     private int pagesNumber;
     private ConcreteProductInShop[] concreteProductInShopArr;
 
+   public boolean getIsAvailable() {
+        return isAvailable;
+    }
+
+    public Book setAvailable(boolean available) {
+        isAvailable = available;
+        return this;
+    }
+
+    private boolean isAvailable;
+
     public Book(int id, String name, String author, String publisher,
                 int releaseYear, int pagesNumber, ConcreteProductInShop[] concreteProductInShopArr) {
         this.id = id;

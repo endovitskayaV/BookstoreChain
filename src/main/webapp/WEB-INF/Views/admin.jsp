@@ -23,7 +23,12 @@ rel="stylesheet">
         <tr>
             <td>
                 <a href="editBook?id=${book.getId()}">  ${book.getName()}</a><br>
-                    ${book.getAuthor()}
+                <c:if test="${!book.getIsAvailable()}">
+                    Нет в продаже
+                </c:if>
+                <c:if test="${book.getIsAvailable()}">
+                    Доступно
+                </c:if>
             </td>
             <td> <a href="deleteBook?id=${book.getId()}" onclick = "return confirm('Удалить?');" >
                 <i class="material-icons"  style="font-size: 10pt;">delete</i></a></td>
@@ -38,8 +43,13 @@ rel="stylesheet">
     <c:forEach var="newspaper" items="${newspapers}">
         <tr>
             <td>
-                <a href="editNewspaper?id=${newspaper.getId()}">  ${newspaper.getName()}</a><br>
-                    ${newspaper.getIssue()}
+                <a href="editNewspaper?id=${newspaper.getId()}">  ${newspaper.getName()}</a> <br>№${newspaper.getIssue()}<br>
+                <c:if test="${!newspaper.getIsAvailable()}">
+                    Нет в продаже
+                </c:if>
+                <c:if test="${newspaper.getIsAvailable()}">
+                    Доступно
+                </c:if>
             </td>
             <td> <a href="deleteNewspaper?id=${newspaper.getId()}" onclick = "return confirm('Удалить?');" >
                 <i class="material-icons"  style="font-size: 10pt;">delete</i></a></td>
@@ -55,8 +65,13 @@ rel="stylesheet">
     <c:forEach var="magazine" items="${magazines}">
         <tr>
             <td>
-                <a href="editMagazine?id=${magazine.getId()}">  ${magazine.getName()}</a><br>
-                    ${magazine.getIssue()}
+                <a href="editMagazine?id=${magazine.getId()}">  ${magazine.getName()}</a> <br> №${magazine.getIssue()}<br>
+                <c:if test="${!magazine.getIsAvailable()}">
+                    Нет в продаже
+                </c:if>
+                <c:if test="${magazine.getIsAvailable()}">
+                    Доступно
+                </c:if>
             </td>
             <td> <a href="deleteMagazine?id=${magazine.getId()}" onclick = "return confirm('Удалить?');" >
                 <i class="material-icons"  style="font-size: 10pt;">delete</i></a></td>

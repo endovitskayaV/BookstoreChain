@@ -9,6 +9,16 @@ public class Newspaper {
     private int issue;
     private ConcreteProductInShop[] concreteProductInShopArr;
 
+    public boolean getIsAvailable() {
+        return isAvailable;
+    }
+
+    public Newspaper setAvailable(boolean available) {
+        isAvailable = available;
+        return this;
+    }
+
+    private boolean isAvailable;
     public Newspaper() {
         concreteProductInShopArr =new ConcreteProductInShop[100];
     }

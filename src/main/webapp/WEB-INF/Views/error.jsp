@@ -7,11 +7,15 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 <head>
     <title>Error</title>
 </head>
 <body>
 Oops! Some problems. Reload this page or try later.<br>
 <b>${errorMsg}</b>
+<br>
+<a href="admin"> <i class="material-icons" style="font-size: 30pt;">home</i></a>
 </body>
 </html>

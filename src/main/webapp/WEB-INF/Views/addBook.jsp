@@ -8,6 +8,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 <head>
     <title>Новая книга</title>
 </head>
@@ -17,7 +19,7 @@
     <input name="id" hidden value="${book.getId()}" type="number"/>
 
     <p><b>Название:</b><br>
-        <input name="name" value="${book.getName()}" type="text"/>
+        <input name="name" required value="${book.getName()}" type="text"/>
     </p>
     <p><b>Автор:</b><br>
         <input name="author" value="${book.getAuthor()}" type="text"/>
@@ -37,6 +39,7 @@
     <button type="submit">Сохранить</button>
 </form>
 
-
+<br>
+<a href="admin"> <i class="material-icons" style="font-size: 20pt;">home</i></a>
 </body>
 </html>

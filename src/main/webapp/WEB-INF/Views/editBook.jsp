@@ -8,7 +8,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
-
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 <head>
     <meta charset="UTF-8"></meta>
     <title>Новая книга</title>
@@ -47,6 +48,7 @@
     </p>
 </form>
 
-
+<br>
+<a href="admin"> <i class="material-icons" style="font-size: 20pt;">home</i></a>
 </body>
 </html>

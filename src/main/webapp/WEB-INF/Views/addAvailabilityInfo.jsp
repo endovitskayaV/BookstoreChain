@@ -8,6 +8,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 <head>
     <title></title>
 </head>
@@ -27,6 +29,7 @@
 
     <c:if test="${!chainStores.isEmpty()}">
 
+        <p><b>Магазин:</b><br>
     <select size="1" name="shopId">
         <c:forEach var="chainStore" items="${chainStores}">
             <optgroup label="${chainStore.getName()}">
@@ -46,10 +49,10 @@
 
 
     <p><b>Количество экземпляров:</b><br>
-        <input name="copiesNumber" value="${concreteProductInShop.getCopiesNumber()}" type="number"/>
+        <input name="copiesNumber" min="1" value="${concreteProductInShop.getCopiesNumber()}" type="number"/>
     </p>
     <p><b>Цена:</b><br>
-        <input name="price" value="${concreteProductInShop.getPrice()}" type="number"/>
+        <input name="price" min="1" value="${concreteProductInShop.getPrice()}" type="number"/>
     </p>
 
     <button type="reset"> Отмена</button>
@@ -57,7 +60,7 @@
     </c:if>
 
 </form>
-
-
+<br>
+<a href="admin"> <i class="material-icons" style="font-size: 20pt;">home</i></a>
 </body>
 </html>

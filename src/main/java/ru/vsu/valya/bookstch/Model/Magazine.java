@@ -10,6 +10,16 @@ public class Magazine {
     private int pagesNumber;
     private ConcreteProductInShop[] concreteProductInShopArr;
 
+    public boolean getIsAvailable() {
+        return isAvailable;
+    }
+
+    public Magazine setAvailable(boolean available) {
+        isAvailable = available;
+        return this;
+    }
+
+    private boolean isAvailable;
     public Magazine() {
         concreteProductInShopArr =new ConcreteProductInShop[100];
     }

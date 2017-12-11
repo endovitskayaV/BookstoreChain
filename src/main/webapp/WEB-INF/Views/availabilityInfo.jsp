@@ -8,6 +8,8 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 <body>
 
 <c:if test="${chainStores.isEmpty()}">
@@ -36,5 +38,8 @@
 
     <br>
 </c:forEach>
+
+<br>
+<a href="admin"> <i class="material-icons" style="font-size: 20pt;">home</i></a>
 </body>
 </html>
