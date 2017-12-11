@@ -26,10 +26,10 @@
         <input name="publisher" value="${book.getPublisher()}" type="text"/>
     </p>
     <p><b>Год издания:</b><br>
-        <input name="releaseYear" min="1" max="${maxYear}" value="${book.getReleaseYear()}" type="number"/>
+        <input name="releaseYear"  min="0" max="${maxYear}" value="${book.getReleaseYear()}" type="number"/>
     </p>
     <p><b>Количество страниц:</b><br>
-        <input name="pagesNumber" min="3" value="${book.getPagesNumber()}" type="number"/>
+        <input name="pagesNumber"  min="0" value="${book.getPagesNumber()}" type="number"/>
     </p>
 
 

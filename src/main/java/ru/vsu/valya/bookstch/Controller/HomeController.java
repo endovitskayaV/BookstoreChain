@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.view.RedirectView;
 import ru.vsu.valya.bookstch.Model.*;
 import ru.vsu.valya.bookstch.db.config.DBConnection;
 
@@ -19,7 +20,7 @@ public class HomeController {
 
     @RequestMapping(value = "/error")
     public String error(ModelMap modelMap, String msg) {
-        modelMap.addAttribute("error", msg);
+        modelMap.addAttribute("errorMsg", msg);
         return "error";
     }
 
@@ -230,8 +231,9 @@ public class HomeController {
     }
 
     @RequestMapping(value = "/addBook", method = RequestMethod.POST)
-    public String addBook(ModelMap modelMap, Book book) throws SQLException, ClassNotFoundException {
+    public RedirectView addBook(ModelMap modelMap, Book book) throws SQLException, ClassNotFoundException {
 
+        if (book.getName().equals("")) return new RedirectView("/error", true);
         DBConnection dbConnection = DBConnection.newInstance();
         dbConnection.executeUpdate(
                 "insert into `Book` " +
@@ -244,20 +246,21 @@ public class HomeController {
                         "'" + book.getReleaseYear() + "', " +
                         "'" + book.getPagesNumber() + "');");
         dbConnection.closeConnection();
-        return admin(modelMap);
+        return new RedirectView("/admin", true);
     }
 
     @RequestMapping(value = "/addNewspaper", method = RequestMethod.GET)
     public String addNewspaper(ModelMap modelMap) {
-       Newspaper newspaper= new Newspaper();
+        Newspaper newspaper = new Newspaper();
         modelMap.addAttribute("newspaper", newspaper);
         modelMap.addAttribute("maxYear", Calendar.getInstance().get(Calendar.YEAR));
         return "addNewspaper";
     }
 
     @RequestMapping(value = "/addNewspaper", method = RequestMethod.POST)
-    public String addNewspaper(ModelMap modelMap, Newspaper newspaper) throws SQLException, ClassNotFoundException {
+    public RedirectView addNewspaper(ModelMap modelMap, Newspaper newspaper) throws SQLException, ClassNotFoundException {
 
+        if (newspaper.getName().equals("")) return new RedirectView("/error", true);
         DBConnection dbConnection = DBConnection.newInstance();
         dbConnection.executeUpdate(
                 "insert into `Newspaper` " +
@@ -268,20 +271,21 @@ public class HomeController {
                         "'" + newspaper.getReleaseYear() + "', " +
                         "'" + newspaper.getIssue() + "');");
         dbConnection.closeConnection();
-        return admin(modelMap);
+        return new RedirectView("/admin", true);
     }
 
     @RequestMapping(value = "/addMagazine", method = RequestMethod.GET)
     public String addMagazine(ModelMap modelMap) {
-        Magazine magazine=new Magazine();
+        Magazine magazine = new Magazine();
         modelMap.addAttribute("magazine", magazine);
         modelMap.addAttribute("maxYear", Calendar.getInstance().get(Calendar.YEAR));
         return "addMagazine";
     }
 
     @RequestMapping(value = "/addMagazine", method = RequestMethod.POST)
-    public String addMagazine(ModelMap modelMap, Magazine magazine) throws SQLException, ClassNotFoundException {
+    public RedirectView addMagazine(ModelMap modelMap, Magazine magazine) throws SQLException, ClassNotFoundException {
 
+        if (magazine.getName().equals("")) return new RedirectView("/error", true);
         DBConnection dbConnection = DBConnection.newInstance();
         dbConnection.executeUpdate(
                 "insert into `Magazine` " +
@@ -291,11 +295,11 @@ public class HomeController {
                         "'" + magazine.getName() + "', " +
                         "'" + magazine.getReleaseYear() + "', " +
                         "'" + magazine.getIssue() + "', " +
-                        "'" + magazine.getPagesNumber() +"');");
+                        "'" + magazine.getPagesNumber() + "');");
         dbConnection.closeConnection();
-        return admin(modelMap);
-    }
+        return new RedirectView("/admin", true);
 
+    }
 
     @RequestMapping(value = "/addAvailabilityInfo", method = RequestMethod.GET)
     public String addAvailabilityInfo(ModelMap modelMap, int itemId, String itemName, String backAddr)
@@ -309,7 +313,7 @@ public class HomeController {
         DBConnection dbConnection = DBConnection.newInstance();
         ResultSet resultSet = dbConnection.executeQuery("select id, address, chain_store_id from shop\n" +
                 "where id not in (select shop_id from concrete_" + itemName + "_shop\n" +
-                "where "+itemName+"_id=" + itemId + " and copies_number>0);");
+                "where " + itemName + "_id=" + itemId + " and copies_number>0);");
 
 
         ArrayList<Shop> shops = new ArrayList<Shop>();
@@ -330,7 +334,7 @@ public class HomeController {
         resultSet = dbConnection.executeQuery("select id, name from chain_store\n" +
                 "where id in (select chain_store_id from shop\n" +
                 "where id not in (select shop_id from concrete_" + itemName + "_shop\n" +
-                "where "+itemName+"_id=" + itemId + " and copies_number>0));");
+                "where " + itemName + "_id=" + itemId + " and copies_number>0));");
 
 
         ArrayList<ChainStore> chainStores = new ArrayList<ChainStore>();
@@ -348,15 +352,15 @@ public class HomeController {
     }
 
     @RequestMapping(value = "/addAvailabilityInfo", method = RequestMethod.POST)
-    public String addAvailabilityInfo(ModelMap modelMap, String backAddr,
-                                      ConcreteProductInShop concreteProductInShop)
+    public RedirectView addAvailabilityInfo(ModelMap modelMap, String backAddr,
+                                            ConcreteProductInShop concreteProductInShop)
             throws SQLException, ClassNotFoundException {
-        if(concreteProductInShop.getCopiesNumber()>0) {
+        if (concreteProductInShop.getCopiesNumber() > 0) {
             DBConnection dbConnection = DBConnection.newInstance();
             dbConnection.executeUpdate(
                     "insert into " +
                             "`concrete_" + concreteProductInShop.getItemName().toLowerCase() + "_shop` " +
-                            "(`"+concreteProductInShop.getItemName()+"_id`," +
+                            "(`" + concreteProductInShop.getItemName() + "_id`," +
                             " `shop_id`, `price`, `copies_number`) \n" +
                             "value (" +
                             "'" + concreteProductInShop.getItemId() + "', " +
@@ -366,11 +370,15 @@ public class HomeController {
 
             dbConnection.closeConnection();
         }
-        switch (backAddr){
-            case "editBook": return editBook(modelMap, concreteProductInShop.getItemId());
-            case "editNewspaper": return editNewspaper(modelMap, concreteProductInShop.getItemId());
-            case "editMagazine": return editMagazine(modelMap, concreteProductInShop.getItemId());
-            default:       return admin(modelMap);
+        switch (backAddr) {
+            case "editBook":
+                return new RedirectView("/editBook?id=" + concreteProductInShop.getItemId(), true);
+            case "editNewspaper":
+                return new RedirectView("/editNewspaper?id=" + concreteProductInShop.getItemId(), true);
+            case "editMagazine":
+                return new RedirectView("/editMagazine?id=" + concreteProductInShop.getItemId(), true);
+            default:
+                return new RedirectView("/admin", true);
         }
     }
 
@@ -397,16 +405,18 @@ public class HomeController {
         modelMap.addAttribute("book", book);
         dbConnection.closeConnection();
 
+        modelMap.addAttribute("maxYear", Calendar.getInstance().get(Calendar.YEAR));
+
         setAvailabilityModel("book", book.getId(), modelMap);
         modelMap.addAttribute("backAddr", "editBook");
         return "editBook";
     }
 
-    @RequestMapping(value = "/editBook",
-            method = RequestMethod.POST,
-            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String editBook(ModelMap modelMap, Book book)
+    @RequestMapping(value = "/editBook", method = RequestMethod.POST)
+    public RedirectView editBook(ModelMap modelMap, Book book)
             throws SQLException, ClassNotFoundException {
+
+        if (book.getName().equals("")) return new RedirectView("/error", true);
         //----------------------update book---------------------//
         DBConnection dbConnection = DBConnection.newInstance();
         dbConnection.executeUpdate(
@@ -429,7 +439,7 @@ public class HomeController {
                 e.printStackTrace();
             }
         });
-        return admin(modelMap);
+        return new RedirectView("/admin", true);
     }
 
     @RequestMapping(value = "/editNewspaper", method = RequestMethod.GET)
@@ -441,9 +451,9 @@ public class HomeController {
                 "select id, name,  release_year, issue" +
                         " from newspaper " +
                         "where id=" + id);
-      Newspaper newspaper=new Newspaper();
+        Newspaper newspaper = new Newspaper();
         while (resultSet.next()) {
-           newspaper
+            newspaper
                     .setId(resultSet.getInt(1))
                     .setName(resultSet.getString(2))
                     .setReleaseYear(resultSet.getInt(3))
@@ -453,17 +463,16 @@ public class HomeController {
         modelMap.addAttribute("newspaper", newspaper);
         dbConnection.closeConnection();
 
+        modelMap.addAttribute("maxYear", Calendar.getInstance().get(Calendar.YEAR));
         setAvailabilityModel("newspaper", newspaper.getId(), modelMap);
         modelMap.addAttribute("backAddr", "editNewspaper");
         return "editNewspaper";
     }
 
-
-    @RequestMapping(value = "/editNewspaper",
-            method = RequestMethod.POST,
-            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String editNewspaper(ModelMap modelMap, Newspaper newspaper)
+    @RequestMapping(value = "/editNewspaper", method = RequestMethod.POST)
+    public RedirectView editNewspaper(ModelMap modelMap, Newspaper newspaper)
             throws SQLException, ClassNotFoundException {
+        if (newspaper.getName().equals("")) return new RedirectView("/error", true);
         //----------------------update book---------------------//
         DBConnection dbConnection = DBConnection.newInstance();
         dbConnection.executeUpdate(
@@ -484,7 +493,7 @@ public class HomeController {
                 e.printStackTrace();
             }
         });
-        return admin(modelMap);
+        return new RedirectView("/admin", true);
     }
 
     @RequestMapping(value = "/editMagazine", method = RequestMethod.GET)
@@ -496,7 +505,7 @@ public class HomeController {
                 "select id, name,  release_year, issue,  page_numbers" +
                         " from magazine " +
                         "where id=" + id);
-      Magazine magazine=new Magazine();
+        Magazine magazine = new Magazine();
         while (resultSet.next()) {
             magazine
                     .setId(resultSet.getInt(1))
@@ -509,16 +518,17 @@ public class HomeController {
         modelMap.addAttribute("magazine", magazine);
         dbConnection.closeConnection();
 
+        modelMap.addAttribute("maxYear", Calendar.getInstance().get(Calendar.YEAR));
         setAvailabilityModel("magazine", magazine.getId(), modelMap);
         modelMap.addAttribute("backAddr", "editMagazine");
         return "editMagazine";
     }
 
-    @RequestMapping(value = "/editMagazine",
-            method = RequestMethod.POST,
-            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String editMagazine(ModelMap modelMap, Magazine magazine)
+    @RequestMapping(value = "/editMagazine", method = RequestMethod.POST)
+    public RedirectView editMagazine(ModelMap modelMap, Magazine magazine)
             throws SQLException, ClassNotFoundException {
+
+        if (magazine.getName().equals("")) return new RedirectView("/error", true);
         //----------------------update book---------------------//
         DBConnection dbConnection = DBConnection.newInstance();
         dbConnection.executeUpdate(
@@ -540,7 +550,7 @@ public class HomeController {
                 e.printStackTrace();
             }
         });
-        return admin(modelMap);
+        return new RedirectView("/admin", true);
     }
 
     private void editConcrete(ConcreteProductInShop concreteProductInShop) throws SQLException, ClassNotFoundException {
@@ -561,13 +571,13 @@ public class HomeController {
 
         try {
             DBConnection dbConnection = DBConnection.newInstance();
-            dbConnection.executeQuery(
+            dbConnection.executeUpdate(
                     "delete from book where id=" + id);
             dbConnection.closeConnection();
         } catch (SQLException e) {
-            return error(modelMap, "cannot delete");
+            return error(modelMap, "Cannot delete book because it exists in shops");
         } catch (ClassNotFoundException e) {
-            return error(modelMap, "cannot delete");
+            return error(modelMap, "Cannot delete book because it exists in shops");
         }
 
         return admin(modelMap);
@@ -578,13 +588,13 @@ public class HomeController {
 
         try {
             DBConnection dbConnection = DBConnection.newInstance();
-            dbConnection.executeQuery(
+            dbConnection.executeUpdate(
                     "delete from newspaper where id=" + id);
             dbConnection.closeConnection();
         } catch (SQLException e) {
-            return error(modelMap, "cannot delete");
+            return error(modelMap, "Cannot delete newspaper because it exists in shops");
         } catch (ClassNotFoundException e) {
-            return error(modelMap, "cannot delete");
+            return error(modelMap, "Cannot delete newspaper because it exists in shops");
         }
 
         return admin(modelMap);
@@ -595,19 +605,20 @@ public class HomeController {
 
         try {
             DBConnection dbConnection = DBConnection.newInstance();
-            dbConnection.executeQuery(
+            dbConnection.executeUpdate(
                     "delete from magazine where id=" + id);
             dbConnection.closeConnection();
         } catch (SQLException e) {
-            return error(modelMap, "cannot delete");
+            return error(modelMap, "Cannot delete magazine because it exists in shops");
         } catch (ClassNotFoundException e) {
-            return error(modelMap, "cannot delete");
+            return error(modelMap, "Cannot delete magazine because it exists in shops");
         }
 
         return admin(modelMap);
     }
 
-    private void setAvailabilityModel(String itemType, int id, ModelMap modelMap) throws SQLException, ClassNotFoundException {
+    private void setAvailabilityModel(String itemType, int id, ModelMap modelMap)
+            throws SQLException, ClassNotFoundException {
         //----------------------------------chainStores---------------------------------------------//
         DBConnection dbConnection = DBConnection.newInstance();
         ResultSet resultSet = dbConnection.executeQuery(
@@ -668,14 +679,16 @@ public class HomeController {
     }
 
     @RequestMapping(value = "/addChainStore", method = RequestMethod.GET)
-    public String addChainStore(ModelMap modelMap){
-       ChainStore chainStore=new ChainStore();
+    public String addChainStore(ModelMap modelMap) {
+        ChainStore chainStore = new ChainStore();
         modelMap.addAttribute("chainStore", chainStore);
         return "addChainStore";
     }
 
     @RequestMapping(value = "/addChainStore", method = RequestMethod.POST)
-    public String addChainStore(ModelMap modelMap, ChainStore chainStore) throws SQLException, ClassNotFoundException {
+    public RedirectView addChainStore(ModelMap modelMap, ChainStore chainStore) throws SQLException, ClassNotFoundException {
+
+        if (chainStore.getName().equals("")) return new RedirectView("/error", true);
 
         DBConnection dbConnection = DBConnection.newInstance();
         dbConnection.executeUpdate(
@@ -685,7 +698,7 @@ public class HomeController {
                         "NULL, " +
                         "'" + chainStore.getName() + "');");
         dbConnection.closeConnection();
-        return admin(modelMap);
+        return new RedirectView("/admin", true);
     }
 
     @RequestMapping(value = "/editChainStore", method = RequestMethod.GET)
@@ -696,9 +709,9 @@ public class HomeController {
                 "select id, name" +
                         " from chain_store " +
                         "where id=" + id);
-        ChainStore chainStore=new ChainStore();
+        ChainStore chainStore = new ChainStore();
         while (resultSet.next()) {
-           chainStore
+            chainStore
                     .setId(resultSet.getInt(1))
                     .setName(resultSet.getString(2));
         }
@@ -709,8 +722,10 @@ public class HomeController {
     }
 
     @RequestMapping(value = "/editChainStore", method = RequestMethod.POST)
-    public String editChainStore(ModelMap modelMap, ChainStore chainStore)
+    public RedirectView editChainStore(ModelMap modelMap, ChainStore chainStore)
             throws SQLException, ClassNotFoundException {
+
+        if (chainStore.getName().equals("")) return new RedirectView("/error", true);
 
         DBConnection dbConnection = DBConnection.newInstance();
         dbConnection.executeUpdate(
@@ -720,33 +735,32 @@ public class HomeController {
 
         dbConnection.closeConnection();
 
-        return admin(modelMap);
+        return new RedirectView("/admin", true);
     }
 
     @RequestMapping(value = "/deleteChainStore")
     public String deleteChainStore(ModelMap modelMap, int id) throws SQLException, ClassNotFoundException {
-
         try {
             DBConnection dbConnection = DBConnection.newInstance();
-            dbConnection.executeQuery(
+            dbConnection.executeUpdate(
                     "delete from chain_store where id=" + id);
             dbConnection.closeConnection();
         } catch (SQLException e) {
-            return error(modelMap, "cannot delete");
+            return error(modelMap, "Cannot delete chain store with shops");
         } catch (ClassNotFoundException e) {
-            return error(modelMap, "cannot delete");
+            return error(modelMap, "Cannot delete chain store with shops");
         }
 
         return admin(modelMap);
     }
 
     @RequestMapping(value = "/addShop", method = RequestMethod.GET)
-    public String addShop(ModelMap modelMap)throws SQLException, ClassNotFoundException{
-        Shop shop=new Shop();
+    public String addShop(ModelMap modelMap) throws SQLException, ClassNotFoundException {
+        Shop shop = new Shop();
         modelMap.addAttribute("shop", shop);
 
         //-------------------chain_stores----------------------------------//
-       DBConnection dbConnection = DBConnection.newInstance();
+        DBConnection dbConnection = DBConnection.newInstance();
         ResultSet resultSet = dbConnection.executeQuery("select id, name from chain_store");
 
         ArrayList<ChainStore> chainStores = new ArrayList<>();
@@ -762,21 +776,21 @@ public class HomeController {
     }
 
     @RequestMapping(value = "/addShop", method = RequestMethod.POST)
-    public String addShop(ModelMap modelMap,Shop shop)
+    public RedirectView addShop(ModelMap modelMap, Shop shop)
             throws SQLException, ClassNotFoundException {
 
-            DBConnection dbConnection = DBConnection.newInstance();
-            dbConnection.executeUpdate(
-                    "insert into shop" +
-                            "(`id`, `address`, `chain_store_id`) \n" +
-                            "value (" +
-                            "'" + shop.getId() + "', " +
-                            "'" + shop.getAddress() + "', " +
-                            "'" + shop.getChainStoreId() + "');");
+        DBConnection dbConnection = DBConnection.newInstance();
+        dbConnection.executeUpdate(
+                "insert into shop" +
+                        "(`id`, `address`, `chain_store_id`) \n" +
+                        "value (" +
+                        "'" + shop.getId() + "', " +
+                        "'" + shop.getAddress() + "', " +
+                        "'" + shop.getChainStoreId() + "');");
 
-            dbConnection.closeConnection();
-         return admin(modelMap);
-        }
+        dbConnection.closeConnection();
+        return new RedirectView("/admin", true);
+    }
 
     @RequestMapping(value = "/editShop", method = RequestMethod.GET)
     public String editShop(ModelMap modelMap, int id) throws SQLException, ClassNotFoundException {
@@ -786,7 +800,7 @@ public class HomeController {
                 "select id, address, chain_store_id" +
                         " from shop " +
                         "where id=" + id);
-        Shop shop=new Shop();
+        Shop shop = new Shop();
         while (resultSet.next()) {
             shop
                     .setId(resultSet.getInt(1))
@@ -799,8 +813,8 @@ public class HomeController {
 
         //--------------------chain_store------------------//
         dbConnection = DBConnection.newInstance();
-        resultSet = dbConnection.executeQuery("select id, name from chain_store\n" +
-                "where id="+shop.getChainStoreId());
+        resultSet = dbConnection.executeQuery("select id, name from chain_store\n");// +
+        // "where id="+shop.getChainStoreId());
 
 
         ArrayList<ChainStore> chainStores = new ArrayList<ChainStore>();
@@ -817,7 +831,7 @@ public class HomeController {
     }
 
     @RequestMapping(value = "/editShop", method = RequestMethod.POST)
-    public String editShop(ModelMap modelMap, Shop shop)
+    public RedirectView editShop(ModelMap modelMap, Shop shop)
             throws SQLException, ClassNotFoundException {
 
         DBConnection dbConnection = DBConnection.newInstance();
@@ -829,7 +843,7 @@ public class HomeController {
 
         dbConnection.closeConnection();
 
-        return admin(modelMap);
+        return new RedirectView("/admin", true);
     }
 
     @RequestMapping(value = "/deleteShop")
@@ -837,13 +851,13 @@ public class HomeController {
 
         try {
             DBConnection dbConnection = DBConnection.newInstance();
-            dbConnection.executeQuery(
+            dbConnection.executeUpdate(
                     "delete from shop where id=" + id);
             dbConnection.closeConnection();
         } catch (SQLException e) {
-            return error(modelMap, "cannot delete");
+            return error(modelMap, "Cannot delete shop with goods");
         } catch (ClassNotFoundException e) {
-            return error(modelMap, "cannot delete");
+            return error(modelMap, "Cannot delete shop with goods");
         }
 
         return admin(modelMap);

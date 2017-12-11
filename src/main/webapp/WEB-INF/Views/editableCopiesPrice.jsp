@@ -34,8 +34,8 @@
                     <input name="concreteProductInShopArr[${i}].itemId" hidden value="${itemId}" type="number"/>
 
 
-                    <input name="concreteProductInShopArr[${i}].price" value="${priceCopies.getPrice()}" type="number" min="1" style="width: 50px;"/>руб.
-                    <input name="concreteProductInShopArr[${i}].copiesNumber" value="${priceCopies.getCopiesNumber()}" min="1" type="number" style="width: 40px;"/>шт.
+                    <input name="concreteProductInShopArr[${i}].price" value="${priceCopies.getPrice()}" type="number" style="width: 50px;"/>руб.
+                    <input name="concreteProductInShopArr[${i}].copiesNumber" value="${priceCopies.getCopiesNumber()}"  type="number" style="width: 40px;"/>шт.
                     <br>
 
                     <c:set var="i">${i+1}</c:set>

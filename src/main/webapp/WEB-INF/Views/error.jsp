@@ -11,7 +11,7 @@
     <title>Error</title>
 </head>
 <body>
-Oops! Some problems. Reload this page or try later.
-${error}
+Oops! Some problems. Reload this page or try later.<br>
+<b>${errorMsg}</b>
 </body>
 </html>

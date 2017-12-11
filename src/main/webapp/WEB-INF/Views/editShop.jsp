@@ -33,7 +33,7 @@
 
         </c:forEach>
     </select>
-
+<br>
     <button type="reset"> Отмена</button>
     <button type="submit">Сохранить</button>
 </form>

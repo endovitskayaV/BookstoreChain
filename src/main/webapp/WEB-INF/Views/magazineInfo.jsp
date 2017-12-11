@@ -13,7 +13,7 @@
 </head>
 <body>
 <h2>${magazine.getName()}</h2><br>
-${magazine.getReleaseDate()}<br>
+${magazine.getReleaseYear()}<br>
 № ${magazine.getIssue()}<br>
 ${magazine.getPagesNumber()} стр. <br>
 <br><br>

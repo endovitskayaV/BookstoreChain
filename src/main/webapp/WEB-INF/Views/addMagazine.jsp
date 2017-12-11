@@ -20,14 +20,14 @@
         <input name="name" value="${magazine.getName()}" type="text"/>
     </p>
     <p><b>Год издания:</b><br>
-        <input name="releaseYear" min="1" max="${maxYear}" value="${magazine.getReleaseYear()}" type="number"/>
+        <input name="releaseYear"  min="0" max="${maxYear}" value="${magazine.getReleaseYear()}" type="number"/>
     </p>
 
     <p><b>Номер:</b><br>
-        <input name="issue" min="3" value="${magazine.getIssue()}" type="number"/>
+        <input name="issue" min="0" value="${magazine.getIssue()}" type="number"/>
     </p>
     <p><b>Количество страниц:</b><br>
-        <input name="pagesNumber" min="3" value="${magazine.getPagesNumber()}" type="number"/>
+        <input name="pagesNumber" min="0" value="${magazine.getPagesNumber()}" type="number"/>
     </p>
 
 

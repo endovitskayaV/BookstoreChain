@@ -22,10 +22,10 @@
         <input name="name" value="${newspaper.getName()}" type="text"/>
     </p>
     <p><b>Год издания:</b><br>
-        <input name="releaseYear" value="${newspaper.getReleaseYear()}" type="number"/>
+        <input name="releaseYear" min="0" max="${maxYear}" value="${newspaper.getReleaseYear()}" type="number"/>
     </p>
     <p><b>Номер:</b><br>
-        <input name="issue" value="${newspaper.getIssue()}" type="number" min="3"/>
+        <input name="issue" min="0" value="${newspaper.getIssue()}" type="number"/>
     </p>
 
 

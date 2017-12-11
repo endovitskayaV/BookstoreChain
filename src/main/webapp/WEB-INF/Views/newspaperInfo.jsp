@@ -13,7 +13,7 @@
 </head>
 <body>
 <h2>${newspaper.getName()}</h2><br>
-${newspaper.getReleaseDate()}<br>
+${newspaper.getReleaseYear()}<br>
 № ${newspaper.getIssue()}<br>
 <br><br>
 
