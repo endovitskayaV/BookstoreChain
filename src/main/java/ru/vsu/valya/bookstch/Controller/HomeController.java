@@ -238,6 +238,11 @@ public class HomeController {
         return "addBook";
     }
 
+    //TODO:  handle the exceptions while adding and all like that
+
+    //TODO: clean code
+
+    //TODO: remove availability from Item classes
     @RequestMapping(value = "/addBook", method = RequestMethod.POST)
     public RedirectView addBook(ModelMap modelMap, Book book) throws SQLException, ClassNotFoundException {
 
